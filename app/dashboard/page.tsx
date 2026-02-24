@@ -1,10 +1,15 @@
-const DashboardPage: React.FC = () => {
+"use client";
+import { Typography } from 'antd';
+
+const DashboardPage = () => {
+
+
     return (
-        <div className="dashboard-page">
-            <h1>Dashboard</h1>
-            <p>Welcome to the dashboard page.</p>
+        <div>
+            <Typography.Title level={2} style={{ color: 'white' }}>Dashboard</Typography.Title>
+            <Typography.Text style={{ color: '#8c8c8c' }}>Welcome to your dashboard. Here you can manage your account and view your statistics.</Typography.Text>
         </div>
     );
-};
+}
 
 export default DashboardPage;

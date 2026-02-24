@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
 import { useStyles } from './style/style';
-import LogoIcon from '@/assets/icons/logo.svg';
+import LogoImage from '@/components/logoImage/LogoImage';
 
 const { Header, Sider, Content } = Layout;
 
@@ -46,13 +46,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 collapsedWidth={80}
             >
                 <Link href="/" className={styles.logoWrapper}>
-                    <Image
-                        src={LogoIcon}
-                        alt="Logo"
-                        width={collapsed ? 30 : 50}
-                        height={30}
-                        className={styles.imageIcon}
-                    />
+                    <LogoImage height={80} width={70} />
                 </Link>
                 <Menu
                     theme="dark"

@@ -1,4 +1,4 @@
-import { createStyles, css } from 'antd-style';
+import { createStyles, css } from "antd-style";
 
 export const useStyles = createStyles(({ token }) => ({
   container: css`
@@ -34,7 +34,6 @@ export const useStyles = createStyles(({ token }) => ({
   `,
 
   logoContainer: css`
-    margin-bottom: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,7 +77,7 @@ export const useStyles = createStyles(({ token }) => ({
     display: flex;
     gap: 16px;
     justify-content: center;
-    
+
     a {
       display: inline-block;
       text-decoration: none;
@@ -103,12 +102,12 @@ export const useStyles = createStyles(({ token }) => ({
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid #4e545f;
       color: white;
-      
+
       &:hover {
         background: rgba(255, 255, 255, 0.1);
         border-color: white;
         color: white;
       }
     }
-  `
+  `,
 }));

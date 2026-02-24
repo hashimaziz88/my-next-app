@@ -44,7 +44,6 @@ export const useStyles = createStyles(({ token }) => ({
   `,
 
   logoContainer: css`
-    margin-bottom: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -64,7 +63,7 @@ export const useStyles = createStyles(({ token }) => ({
 
   headerSection: css`
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
   `,
 
   formHeading: css`
@@ -187,7 +186,7 @@ export const useStyles = createStyles(({ token }) => ({
   checkbox: css`
     &.ant-checkbox-wrapper {
       color: #cbd5e0;
-      
+
       .ant-checkbox + span {
         color: #cbd5e0;
       }

@@ -1,11 +1,10 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button, Checkbox, Form, Input, Typography, Divider, FormProps } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
-import LogoIcon from '@/assets/icons/logo.svg';
+import LogoImage from '@/components/logoImage/LogoImage';
 
 const { Text, Title } = Typography;
 
@@ -31,7 +30,7 @@ const Login: React.FC = () => {
             <div className={styles.backgroundGlow} />
             <div className={styles.formContainer}>
                 <Link href="/" className={styles.logoContainer}>
-                    <Image src={LogoIcon} alt="Logo" width={60} height={36} className={styles.imageIcon} />
+                    <LogoImage height={80} width={160} />
                 </Link>
 
                 <div className={styles.headerSection}>

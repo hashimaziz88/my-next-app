@@ -1,11 +1,9 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button, Typography } from "antd";
 import { useStyles } from './style/style';
-import LogoIcon from '@/assets/icons/logo.svg';
-
+import LogoImage from '@/components/logoImage/LogoImage';
 const { Title, Text } = Typography;
 
 export default function Home() {
@@ -17,13 +15,7 @@ export default function Home() {
 
       <main className={styles.heroSection}>
         <div className={styles.logoContainer}>
-          <Image
-            src={LogoIcon}
-            alt="App Logo"
-            width={100}
-            height={60}
-            className={styles.imageIcon}
-          />
+          <LogoImage height={80} width={160} />
         </div>
 
         <Title className={styles.heroTitle}>
