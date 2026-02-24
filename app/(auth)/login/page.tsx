@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Button, Checkbox, Form, Input, Typography, Divider } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, Divider, FormProps } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
 import LogoIcon from '@/assets/icons/logo.svg';
@@ -13,6 +13,14 @@ type FieldType = {
     username?: string;
     password?: string;
     remember?: boolean;
+};
+
+const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+    console.log('Success:', values);
+};
+
+const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.log('Failed:', errorInfo);
 };
 
 const Login: React.FC = () => {
@@ -37,6 +45,8 @@ const Login: React.FC = () => {
                     requiredMark={false}
                     initialValues={{ remember: true }}
                     className={styles.form}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
                 >
                     <Form.Item<FieldType>
                         label="Username or Email"

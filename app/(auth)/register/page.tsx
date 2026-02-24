@@ -2,12 +2,28 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Button, Checkbox, Form, Input, Typography, Divider } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, Divider, FormProps } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
 import LogoIcon from '@/assets/icons/logo.svg';
 
 const { Text, Title } = Typography;
+
+type FieldType = {
+    username?: string;
+    email?: string;
+    password?: string;
+    remember?: boolean;
+};
+
+
+const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+    console.log('Success:', values);
+};
+
+const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+};
 
 const Register: React.FC = () => {
     const { styles } = useStyles();
@@ -29,16 +45,27 @@ const Register: React.FC = () => {
                     layout="vertical"
                     requiredMark={false}
                     className={styles.form}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
                 >
-                    <Form.Item label="Username" name="username">
+                    <Form.Item
+                        label="Username"
+                        name="username"
+                        rules={[{ required: true, message: 'Please enter your username' }]}>
                         <Input prefix={<UserOutlined />} placeholder="johndoe" size="large" />
                     </Form.Item>
 
-                    <Form.Item label="Email Address" name="email">
+                    <Form.Item
+                        label="Email Address"
+                        name="email"
+                        rules={[{ required: true, message: 'Please enter your email address' }]}>
                         <Input prefix={<MailOutlined />} placeholder="name@company.com" size="large" />
                     </Form.Item>
 
-                    <Form.Item label="Password" name="password">
+                    <Form.Item
+                        label="Password"
+                        name="password"
+                        rules={[{ required: true, message: 'Please enter your password' }]}>
                         <Input.Password prefix={<LockOutlined />} placeholder="••••••••" size="large" />
                     </Form.Item>
 
@@ -61,7 +88,7 @@ const Register: React.FC = () => {
                     </div>
                 </Form>
             </div>
-        </div>
+        </div >
     );
 };
 

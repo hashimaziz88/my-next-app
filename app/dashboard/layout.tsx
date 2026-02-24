@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
-    UploadOutlined,
     UserOutlined,
-    VideoCameraOutlined,
+    DashboardOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
 import { useStyles } from './style/style';
@@ -19,6 +19,21 @@ const { Header, Sider, Content } = Layout;
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
     const { styles } = useStyles();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const menuItems = [
+        {
+            key: '/dashboard',
+            icon: <DashboardOutlined />,
+            label: 'Dashboard',
+        },
+        {
+            key: '/dashboard/profile',
+            icon: <UserOutlined />,
+            label: 'Profile',
+        },
+    ];
 
     return (
         <Layout className={styles.container}>
@@ -27,6 +42,8 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 collapsible
                 collapsed={collapsed}
                 className={styles.sider}
+                width={200}
+                collapsedWidth={80}
             >
                 <Link href="/" className={styles.logoWrapper}>
                     <Image
@@ -34,30 +51,15 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
                         alt="Logo"
                         width={collapsed ? 30 : 50}
                         height={30}
-                        className={styles.imageIcon} // Reusing your brightness filter style
+                        className={styles.imageIcon}
                     />
                 </Link>
                 <Menu
                     theme="dark"
                     mode="inline"
-                    defaultSelectedKeys={['1']}
-                    items={[
-                        {
-                            key: '1',
-                            icon: <UserOutlined />,
-                            label: 'nav 1',
-                        },
-                        {
-                            key: '2',
-                            icon: <VideoCameraOutlined />,
-                            label: 'nav 2',
-                        },
-                        {
-                            key: '3',
-                            icon: <UploadOutlined />,
-                            label: 'nav 3',
-                        },
-                    ]}
+                    selectedKeys={[pathname]}
+                    onClick={({ key }) => router.push(key)}
+                    items={menuItems}
                 />
             </Sider>
             <Layout style={{ background: 'transparent' }}>
