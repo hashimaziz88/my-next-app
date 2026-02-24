@@ -42,11 +42,6 @@ const Register: React.FC = () => {
                         <Input.Password prefix={<LockOutlined />} placeholder="••••••••" size="large" />
                     </Form.Item>
 
-                    <Form.Item name="agreement" valuePropName="checked">
-                        <Checkbox className={styles.checkbox}>
-                            I agree to the <Link href="/terms">Terms & Conditions</Link>
-                        </Checkbox>
-                    </Form.Item>
 
                     <Form.Item>
                         <Button type="primary" htmlType="submit" size="large" block>

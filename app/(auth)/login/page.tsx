@@ -58,7 +58,6 @@ const Login: React.FC = () => {
                         <Form.Item name="remember" valuePropName="checked" noStyle>
                             <Checkbox className={styles.checkbox}>Remember me</Checkbox>
                         </Form.Item>
-                        <Link href="/forgot-password">Forgot password?</Link>
                     </div>
 
                     <Form.Item>
