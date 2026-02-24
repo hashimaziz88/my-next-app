@@ -1,21 +1,24 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Button, Checkbox, Form, Input, Typography, Divider, FormProps } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, Divider, FormProps, message } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
 import LogoImage from '@/components/logoImage/LogoImage';
+import { useAuthActions, useAuthState } from '@/providers/authProvider';
+import Spinner from "@/components/spinner/Spinner";
+import { IUserLoginRequest } from '@/providers/authProvider/context';
 
 const { Text, Title } = Typography;
 
 type FieldType = {
-    username?: string;
+    email?: string;
     password?: string;
     remember?: boolean;
 };
 
 const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
+
 };
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
@@ -24,7 +27,34 @@ const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
 
 const Login: React.FC = () => {
     const { styles } = useStyles();
+    const { login } = useAuthActions();
+    const { isPending, isError } = useAuthState();
 
+    // 2. Wrap the side effect in useEffect
+    useEffect(() => {
+        if (isError) {
+            message.error('Login failed. Please check your credentials and try again.');
+        }
+    }, [isError]); // Only runs when isError changes
+
+    // 3. Keep your early return for the spinner
+    if (isPending) {
+        return <Spinner />;
+    }
+
+
+    const onFinish: FormProps<IUserLoginRequest>['onFinish'] = (values) => {
+        const newUser: IUserLoginRequest = {
+            email: values.email,
+            password: values.password
+        }
+        login(newUser)
+
+    };
+
+    const onFinishFailed: FormProps<IUserLoginRequest>['onFinishFailed'] = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
     return (
         <div className={styles.container}>
             <div className={styles.backgroundGlow} />
@@ -48,9 +78,9 @@ const Login: React.FC = () => {
                     onFinishFailed={onFinishFailed}
                 >
                     <Form.Item<FieldType>
-                        label="Username or Email"
-                        name="username"
-                        rules={[{ required: true, message: 'Please enter your username' }]}
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please enter your email' }]}
                     >
                         <Input prefix={<UserOutlined />} placeholder="Enter your username" size="large" />
                     </Form.Item>
