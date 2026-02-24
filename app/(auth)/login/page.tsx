@@ -74,7 +74,7 @@ const Login: React.FC = () => {
                     </Button>
 
                     <div className={styles.footerLinkSection}>
-                        <Text className={styles.footerLinkText}>Don't have an account?</Text>
+                        <Text className={styles.footerLinkText}>Don&apos;t have an account?</Text>
                         <Link href="/register">Sign up for free</Link>
                     </div>
                 </Form>
