@@ -1,9 +1,11 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button, Checkbox, Form, Input, Typography, Divider } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
+import LogoIcon from '@/assets/icons/logo.svg';
 
 const { Text, Title } = Typography;
 
@@ -12,7 +14,12 @@ const Register: React.FC = () => {
 
     return (
         <div className={styles.container}>
+            <div className={styles.backgroundGlow} />
             <div className={styles.formContainer}>
+                <Link href="/" className={styles.logoContainer}>
+                    <Image src={LogoIcon} alt="Logo" width={60} height={36} className={styles.imageIcon} />
+                </Link>
+
                 <div className={styles.headerSection}>
                     <Title level={2} className={styles.formHeading}>Create Account</Title>
                     <Text className={styles.formSubtitle}>Join us and start your journey today.</Text>

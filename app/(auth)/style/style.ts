@@ -8,6 +8,20 @@ export const useStyles = createStyles(({ token }) => ({
     min-height: 100vh;
     background: radial-gradient(circle at 0% 0%, #3a3f47 0%, #1a1c22 100%);
     padding: 24px;
+    position: relative;
+    overflow: hidden;
+  `,
+
+  backgroundGlow: css`
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: ${token.colorPrimary};
+    filter: blur(180px);
+    opacity: 0.15;
+    top: 10%;
+    left: 5%;
+    pointer-events: none;
   `,
 
   formContainer: css`
@@ -21,11 +35,31 @@ export const useStyles = createStyles(({ token }) => ({
     max-width: 440px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.3s ease-in-out;
+    z-index: 10;
 
     &:hover {
       border-color: rgba(255, 255, 255, 0.15);
       transform: translateY(-4px);
     }
+  `,
+
+  logoContainer: css`
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    filter: drop-shadow(0 0 8px rgba(24, 144, 255, 0.3));
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  `,
+
+  imageIcon: css`
+    filter: brightness(0) invert(1);
+    object-fit: contain;
   `,
 
   headerSection: css`
@@ -34,9 +68,11 @@ export const useStyles = createStyles(({ token }) => ({
   `,
 
   formHeading: css`
-    color: white !important;
-    font-weight: 800 !important;
-    margin-bottom: 8px !important;
+    &.ant-typography {
+      color: white;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
   `,
 
   formSubtitle: css`
@@ -46,42 +82,45 @@ export const useStyles = createStyles(({ token }) => ({
 
   form: css`
     .ant-form-item-label > label {
-      color: #cbd5e0 !important;
+      color: #cbd5e0;
       font-weight: 500;
     }
 
-    /* Target both standard and password inputs */
-    .ant-input-affix-wrapper, 
-    .ant-input, 
+    /* Standardizing Inputs without !important */
+    .ant-input-affix-wrapper,
+    .ant-input,
     .ant-input-password {
-      background: rgba(255, 255, 255, 0.03) !important;
-      margin-left: 10px !important;
-      color: white !important;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid #4e545f;
+      color: white;
       padding: 10px 14px;
       border-radius: 8px;
-      outline: none !important; /* Removes browser default */
-      box-shadow: none !important; /* Removes AntD default blue glow */
+      outline: none;
+      box-shadow: none;
 
-      &:hover, &-focused, &:focus {
-        border-color: ${token.colorPrimary} !important;
-        background: rgba(255, 255, 255, 0.05) !important;
-        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+      &:hover,
+      &-focused,
+      &:focus {
+        border-color: ${token.colorPrimary};
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
       }
 
       input {
-        background: transparent !important;
-        color: white !important;
+        background: transparent;
+        color: white;
+
         &::placeholder {
           color: #666;
         }
       }
 
-      /* Fix for the eye icon and user icons */
       .anticon {
         color: #666;
       }
     }
 
+    /* Primary Submit Button Styles */
     .ant-btn-primary {
       height: 48px;
       border-radius: 8px;
@@ -89,36 +128,42 @@ export const useStyles = createStyles(({ token }) => ({
       font-size: 16px;
       box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
       border: none;
+      width: 100%;
     }
   `,
 
-
-
   divider: css`
-    margin: 24px 0 !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-    span {
-      color: #666 !important;
-      font-size: 12px;
-      background: transparent !important;
+    &.ant-divider {
+      margin: 24px 0;
+      border-top-color: rgba(255, 255, 255, 0.1);
+
+      .ant-divider-inner-text {
+        color: #666;
+        font-size: 12px;
+        background: transparent;
+      }
     }
   `,
 
   socialButton: css`
-    width: 100%;
-    height: 48px;
-    background: transparent !important;
-    color: white !important;
-    border: 1px solid #4e545f !important;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.05) !important;
-      border-color: white !important;
+    &.ant-btn {
+      width: 100%;
+      height: 48px;
+      background: transparent;
+      color: white;
+      border: 1px solid #4e545f;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      &:hover,
+      &:focus {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: white;
+        color: white;
+      }
     }
   `,
 
@@ -132,6 +177,7 @@ export const useStyles = createStyles(({ token }) => ({
       font-size: 14px;
       color: ${token.colorPrimary};
       transition: opacity 0.2s;
+
       &:hover {
         opacity: 0.8;
       }
@@ -139,32 +185,42 @@ export const useStyles = createStyles(({ token }) => ({
   `,
 
   checkbox: css`
-    color: #cbd5e0;
-    span:last-child {
+    &.ant-checkbox-wrapper {
+      color: #cbd5e0;
+      
+      .ant-checkbox + span {
         color: #cbd5e0;
+      }
     }
-    
-    /* Next.js Links inside checkboxes (Terms) */
+
+    /* Link color inside checkbox (Terms) */
     a {
-        color: ${token.colorPrimary};
-        margin-left: 4px;
+      color: ${token.colorPrimary};
+      margin-left: 4px;
     }
   `,
 
   footerLinkSection: css`
     text-align: center;
     margin-top: 32px;
-    color: #8c8c8c;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
 
     a {
       font-weight: 600;
       color: ${token.colorPrimary};
-      margin-left: 4px;
+      transition: color 0.2s;
+
+      &:hover {
+        color: ${token.colorPrimaryActive};
+      }
     }
   `,
 
-
   footerLinkText: css`
-    color: #8c8c8c;
-  `
+    &.ant-typography {
+      color: #8c8c8c;
+    }
+  `,
 }));

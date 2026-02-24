@@ -1,9 +1,11 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button, Checkbox, Form, Input, Typography, Divider } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
+import LogoIcon from '@/assets/icons/logo.svg';
 
 const { Text, Title } = Typography;
 
@@ -16,10 +18,14 @@ type FieldType = {
 const Login: React.FC = () => {
     const { styles } = useStyles();
 
-
     return (
         <div className={styles.container}>
+            <div className={styles.backgroundGlow} />
             <div className={styles.formContainer}>
+                <Link href="/" className={styles.logoContainer}>
+                    <Image src={LogoIcon} alt="Logo" width={60} height={36} className={styles.imageIcon} />
+                </Link>
+
                 <div className={styles.headerSection}>
                     <Title level={2} className={styles.formHeading}>Welcome Back</Title>
                     <Text className={styles.formSubtitle}>Enter your credentials to access your account.</Text>
@@ -37,11 +43,7 @@ const Login: React.FC = () => {
                         name="username"
                         rules={[{ required: true, message: 'Please enter your username' }]}
                     >
-                        <Input
-                            prefix={<UserOutlined />}
-                            placeholder="Enter your username"
-                            size="large"
-                        />
+                        <Input prefix={<UserOutlined />} placeholder="Enter your username" size="large" />
                     </Form.Item>
 
                     <Form.Item<FieldType>
@@ -49,11 +51,7 @@ const Login: React.FC = () => {
                         name="password"
                         rules={[{ required: true, message: 'Please enter your password' }]}
                     >
-                        <Input.Password
-                            prefix={<LockOutlined />}
-                            placeholder="••••••••"
-                            size="large"
-                        />
+                        <Input.Password prefix={<LockOutlined />} placeholder="••••••••" size="large" />
                     </Form.Item>
 
                     <div className={styles.checkBoxContainer}>
