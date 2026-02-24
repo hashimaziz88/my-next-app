@@ -19,6 +19,7 @@ export const useStyles = createStyles(({ token }) => ({
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     width: 100%;
     max-width: 440px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.3s ease-in-out;
 
     &:hover {
@@ -49,21 +50,35 @@ export const useStyles = createStyles(({ token }) => ({
       font-weight: 500;
     }
 
-    .ant-input-affix-wrapper, .ant-input {
+    /* Target both standard and password inputs */
+    .ant-input-affix-wrapper, 
+    .ant-input, 
+    .ant-input-password {
       background: rgba(255, 255, 255, 0.03) !important;
-      border: 1.5px solid #4e545f !important;
+      margin-left: 10px !important;
       color: white !important;
       padding: 10px 14px;
       border-radius: 8px;
+      outline: none !important; /* Removes browser default */
+      box-shadow: none !important; /* Removes AntD default blue glow */
 
-      &:hover, &-focused {
+      &:hover, &-focused, &:focus {
         border-color: ${token.colorPrimary} !important;
         background: rgba(255, 255, 255, 0.05) !important;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
       }
 
       input {
         background: transparent !important;
         color: white !important;
+        &::placeholder {
+          color: #666;
+        }
+      }
+
+      /* Fix for the eye icon and user icons */
+      .anticon {
+        color: #666;
       }
     }
 
@@ -73,8 +88,11 @@ export const useStyles = createStyles(({ token }) => ({
       font-weight: 600;
       font-size: 16px;
       box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+      border: none;
     }
   `,
+
+
 
   divider: css`
     margin: 24px 0 !important;
@@ -82,6 +100,7 @@ export const useStyles = createStyles(({ token }) => ({
     span {
       color: #666 !important;
       font-size: 12px;
+      background: transparent !important;
     }
   `,
 
@@ -103,18 +122,49 @@ export const useStyles = createStyles(({ token }) => ({
     }
   `,
 
-  footerText: css`
-    color: #fff;
-  `,
-
   checkBoxContainer: css`
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+
+    a {
+      font-size: 14px;
+      color: ${token.colorPrimary};
+      transition: opacity 0.2s;
+      &:hover {
+        opacity: 0.8;
+      }
+    }
   `,
 
   checkbox: css`
-    color: #fff;
-    `
+    color: #cbd5e0;
+    span:last-child {
+        color: #cbd5e0;
+    }
+    
+    /* Next.js Links inside checkboxes (Terms) */
+    a {
+        color: ${token.colorPrimary};
+        margin-left: 4px;
+    }
+  `,
+
+  footerLinkSection: css`
+    text-align: center;
+    margin-top: 32px;
+    color: #8c8c8c;
+
+    a {
+      font-weight: 600;
+      color: ${token.colorPrimary};
+      margin-left: 4px;
+    }
+  `,
+
+
+  footerLinkText: css`
+    color: #8c8c8c;
+  `
 }));

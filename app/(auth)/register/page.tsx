@@ -1,30 +1,11 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import type { FormProps } from 'antd';
 import { Button, Checkbox, Form, Input, Typography, Divider } from 'antd';
-import {
-    UserOutlined,
-    LockOutlined,
-    MailOutlined,
-    GoogleOutlined
-} from '@ant-design/icons';
+import { UserOutlined, LockOutlined, MailOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
 
 const { Text, Title } = Typography;
-
-type FieldType = {
-    username?: string;
-    email?: string;
-    password?: string;
-    confirm?: string;
-    agreement?: boolean;
-};
-
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    // In Next.js, you'd typically call an API route here: /api/auth/register
-    console.log('Register Success:', values);
-};
 
 const Register: React.FC = () => {
     const { styles } = useStyles();
@@ -38,84 +19,25 @@ const Register: React.FC = () => {
                 </div>
 
                 <Form
-                    name="register_form"
                     layout="vertical"
                     requiredMark={false}
-                    onFinish={onFinish}
-                    autoComplete="off"
                     className={styles.form}
                 >
-                    <Form.Item<FieldType>
-                        label="Username"
-                        name="username"
-                        rules={[{ required: true, message: 'Please choose a username' }]}
-                    >
-                        <Input
-                            prefix={<UserOutlined style={{ color: '#666' }} />}
-                            placeholder="johndoe"
-                            size="large"
-                        />
+                    <Form.Item label="Username" name="username">
+                        <Input prefix={<UserOutlined />} placeholder="johndoe" size="large" />
                     </Form.Item>
 
-                    <Form.Item<FieldType>
-                        label="Email Address"
-                        name="email"
-                        rules={[
-                            { required: true, message: 'Please input your email' },
-                            { type: 'email', message: 'Please enter a valid email' }
-                        ]}
-                    >
-                        <Input
-                            prefix={<MailOutlined style={{ color: '#666' }} />}
-                            placeholder="name@company.com"
-                            size="large"
-                        />
+                    <Form.Item label="Email Address" name="email">
+                        <Input prefix={<MailOutlined />} placeholder="name@company.com" size="large" />
                     </Form.Item>
 
-                    <Form.Item<FieldType>
-                        label="Password"
-                        name="password"
-                        rules={[{ required: true, message: 'Please input your password' }]}
-                    >
-                        <Input.Password
-                            prefix={<LockOutlined style={{ color: '#666' }} />}
-                            placeholder="••••••••"
-                            size="large"
-                        />
+                    <Form.Item label="Password" name="password">
+                        <Input.Password prefix={<LockOutlined />} placeholder="••••••••" size="large" />
                     </Form.Item>
 
-                    <Form.Item<FieldType>
-                        label="Confirm Password"
-                        name="confirm"
-                        dependencies={['password']}
-                        rules={[
-                            { required: true, message: 'Please confirm your password' },
-                            ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                    if (!value || getFieldValue('password') === value) {
-                                        return Promise.resolve();
-                                    }
-                                    return Promise.reject(new Error('Passwords do not match'));
-                                },
-                            }),
-                        ]}
-                    >
-                        <Input.Password
-                            prefix={<LockOutlined style={{ color: '#666' }} />}
-                            placeholder="Confirm your password"
-                            size="large"
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="agreement"
-                        valuePropName="checked"
-                        rules={[{
-                            validator: (_, value) => value ? Promise.resolve() : Promise.reject(new Error('Should accept agreement'))
-                        }]}
-                    >
+                    <Form.Item name="agreement" valuePropName="checked">
                         <Checkbox className={styles.checkbox}>
-                            I agree to the <Link href="/terms" style={{ color: '#1890ff' }}>Terms & Conditions</Link>
+                            I agree to the <Link href="/terms">Terms & Conditions</Link>
                         </Checkbox>
                     </Form.Item>
 
@@ -131,13 +53,9 @@ const Register: React.FC = () => {
                         Sign up with Google
                     </Button>
 
-                    <div style={{ textAlign: 'center', marginTop: 32 }}>
-                        <Text style={{ color: '#8c8c8c' }}>
-                            Already have an account?{' '}
-                            <Link href="/login" style={{ fontWeight: 600, color: '#1890ff' }}>
-                                Log in
-                            </Link>
-                        </Text>
+                    <div className={styles.footerLinkSection}>
+                        <Text className={styles.footerLinkText}>Already have an account?</Text>
+                        <Link href="/login">Log in</Link>
                     </div>
                 </Form>
             </div>

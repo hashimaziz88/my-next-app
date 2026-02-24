@@ -1,7 +1,6 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import type { FormProps } from 'antd';
 import { Button, Checkbox, Form, Input, Typography, Divider } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
@@ -14,13 +13,9 @@ type FieldType = {
     remember?: boolean;
 };
 
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    // Integrate with NextAuth.js or your custom API route
-    console.log('Login Success:', values);
-};
-
 const Login: React.FC = () => {
     const { styles } = useStyles();
+
 
     return (
         <div className={styles.container}>
@@ -35,7 +30,6 @@ const Login: React.FC = () => {
                     layout="vertical"
                     requiredMark={false}
                     initialValues={{ remember: true }}
-                    onFinish={onFinish}
                     className={styles.form}
                 >
                     <Form.Item<FieldType>
@@ -44,7 +38,7 @@ const Login: React.FC = () => {
                         rules={[{ required: true, message: 'Please enter your username' }]}
                     >
                         <Input
-                            prefix={<UserOutlined style={{ color: '#666' }} />}
+                            prefix={<UserOutlined />}
                             placeholder="Enter your username"
                             size="large"
                         />
@@ -56,7 +50,7 @@ const Login: React.FC = () => {
                         rules={[{ required: true, message: 'Please enter your password' }]}
                     >
                         <Input.Password
-                            prefix={<LockOutlined style={{ color: '#666' }} />}
+                            prefix={<LockOutlined />}
                             placeholder="••••••••"
                             size="large"
                         />
@@ -66,9 +60,7 @@ const Login: React.FC = () => {
                         <Form.Item name="remember" valuePropName="checked" noStyle>
                             <Checkbox className={styles.checkbox}>Remember me</Checkbox>
                         </Form.Item>
-                        <Link href="/forgot-password" style={{ fontSize: '14px', color: '#1890ff' }}>
-                            Forgot password?
-                        </Link>
+                        <Link href="/forgot-password">Forgot password?</Link>
                     </div>
 
                     <Form.Item>
@@ -83,13 +75,9 @@ const Login: React.FC = () => {
                         Continue with Google
                     </Button>
 
-                    <div style={{ textAlign: 'center', marginTop: 32 }}>
-                        <Text style={{ color: '#8c8c8c' }}>
-                            Don't have an account?{' '}
-                            <Link href="/register" style={{ fontWeight: 600, color: '#1890ff' }}>
-                                Sign up for free
-                            </Link>
-                        </Text>
+                    <div className={styles.footerLinkSection}>
+                        <Text className={styles.footerLinkText}>Don't have an account?</Text>
+                        <Link href="/register">Sign up for free</Link>
                     </div>
                 </Form>
             </div>
