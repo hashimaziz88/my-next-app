@@ -19,12 +19,11 @@ export default function Home() {
         </div>
 
         <Title className={styles.heroTitle}>
-          Welcome to App
+          Welcome to OptiSAS
         </Title>
 
         <Text className={styles.heroSubtitle}>
-          The modern platform for building high-performance
-          interfaces with Ant Design and Next.js.
+          Your all-in-one CRM solution for seamless client management and business growth.
         </Text>
 
         <div className={styles.buttonGroup}>

@@ -11,6 +11,9 @@ import {
     TeamOutlined,
     ContactsOutlined,
     RiseOutlined,
+    CalendarOutlined,
+    FileTextOutlined,
+    FolderOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
 import { useStyles } from './style/style';
@@ -29,6 +32,9 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
         { key: '/dashboard/clients', icon: <TeamOutlined />, label: 'Clients' },
         { key: '/dashboard/contacts', icon: <ContactsOutlined />, label: 'Contacts' },
         { key: '/dashboard/opportunities', icon: <RiseOutlined />, label: 'Opportunities' },
+        { key: '/dashboard/activities', icon: <CalendarOutlined />, label: 'Activities' },
+        { key: '/dashboard/notes', icon: <FileTextOutlined />, label: 'Notes' },
+        { key: '/dashboard/documents', icon: <FolderOutlined />, label: 'Documents' },
         { key: '/dashboard/profile', icon: <UserOutlined />, label: 'Profile' },
     ];
 

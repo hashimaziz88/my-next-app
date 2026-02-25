@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { Button, Table, Space, Modal, Form, Input, Select, InputNumber, message, Popconfirm, Typography, Tag, Card, Segmented } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, SearchOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, EyeOutlined, SearchOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { useOpportunityActions, useOpportunityState } from '@/providers/opportunityProvider';
 import { IOpportunityDto, ICreateOpportunityDto } from '@/providers/opportunityProvider/context';
 import { useClientActions, useClientState } from '@/providers/clientProvider';
@@ -9,6 +9,12 @@ import { useRouter } from 'next/navigation';
 import type { TableProps } from 'antd';
 
 const { Title, Text } = Typography;
+
+const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
+const cardStyle: React.CSSProperties = {
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 12,
+};
 
 const STAGES: { value: number; label: string; color: string }[] = [
     { value: 0, label: 'Lead', color: '#1890ff' },
@@ -179,21 +185,27 @@ const OpportunitiesPage: React.FC = () => {
     );
 
     return (
-        <div>
+        <div style={pageStyle}>
+            {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                <Title level={2} style={{ color: 'white', margin: 0 }}>Opportunities</Title>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => { form.resetFields(); setIsModalOpen(true); }}>
+                <div>
+                    <Title level={2} style={{ color: 'white', margin: 0 }}>Opportunities</Title>
+                    <Text style={{ color: '#8c8c8c' }}>Track your sales pipeline and deals</Text>
+                </div>
+                <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => { form.resetFields(); setIsModalOpen(true); }}>
                     New Opportunity
                 </Button>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            {/* Toolbar */}
+            <div style={{ ...cardStyle, padding: '12px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
                 <Input
-                    placeholder="Search by title or client..."
+                    placeholder="Search by title or client…"
                     prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    style={{ maxWidth: 300, background: 'rgba(255,255,255,0.05)', borderColor: '#4e545f', color: 'white' }}
+                    style={{ maxWidth: 300, background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'white' }}
+                    allowClear
                 />
                 <Segmented
                     value={viewMode}
@@ -208,57 +220,57 @@ const OpportunitiesPage: React.FC = () => {
             {viewMode === 'kanban' ? (
                 <KanbanView />
             ) : (
-                <Table
-                    dataSource={filtered}
-                    columns={columns}
-                    loading={isPending}
-                    rowKey="id"
-                    onRow={record => ({ onClick: () => router.push(`/dashboard/opportunities/${record.id}`), style: { cursor: 'pointer' } })}
-                    pagination={{ pageSize: 10 }}
-                />
+                <div style={cardStyle}>
+                    <Table
+                        dataSource={filtered}
+                        columns={columns}
+                        loading={isPending}
+                        rowKey="id"
+                        size="middle"
+                        scroll={{ x: 'max-content' }}
+                        onRow={record => ({ onClick: () => router.push(`/dashboard/opportunities/${record.id}`), style: { cursor: 'pointer' } })}
+                        pagination={{ pageSize: 10, showSizeChanger: false }}
+                        style={{ background: 'transparent' }}
+                    />
+                </div>
             )}
 
             <Modal
-                title="New Opportunity"
+                title={<span style={{ color: 'white' }}>New Opportunity</span>}
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
-                footer={null}
+                onOk={() => form.submit()}
+                okText="Create"
+                confirmLoading={isPending}
                 width={560}
+                styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
-                    <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Required' }]}>
+                    <Form.Item name="title" label={<span style={{ color: '#d4d4d4' }}>Title</span>} rules={[{ required: true, message: 'Required' }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="clientId" label="Client" rules={[{ required: true, message: 'Required' }]}>
-                        <Select options={clientOptions} showSearch optionFilterProp="label" />
+                    <Form.Item name="clientId" label={<span style={{ color: '#d4d4d4' }}>Client</span>} rules={[{ required: true, message: 'Required' }]}>
+                        <Select options={clientOptions} showSearch />
                     </Form.Item>
-                    <Space style={{ width: '100%', display: 'flex', gap: 16 }}>
-                        <Form.Item name="estimatedValue" label="Estimated Value" rules={[{ required: true, message: 'Required' }]} style={{ flex: 1 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <Form.Item name="estimatedValue" label={<span style={{ color: '#d4d4d4' }}>Estimated Value</span>} rules={[{ required: true, message: 'Required' }]}>
                             <InputNumber style={{ width: '100%' }} min={0} />
                         </Form.Item>
-                        <Form.Item name="currency" label="Currency" initialValue="ZAR" style={{ flex: 1 }}>
+                        <Form.Item name="currency" label={<span style={{ color: '#d4d4d4' }}>Currency</span>} initialValue="ZAR">
                             <Input />
                         </Form.Item>
-                    </Space>
-                    <Space style={{ width: '100%', display: 'flex', gap: 16 }}>
-                        <Form.Item name="probability" label="Probability (%)" style={{ flex: 1 }}>
+                        <Form.Item name="probability" label={<span style={{ color: '#d4d4d4' }}>Probability (%)</span>}>
                             <InputNumber style={{ width: '100%' }} min={0} max={100} />
                         </Form.Item>
-                        <Form.Item name="source" label="Source" style={{ flex: 1 }}>
+                        <Form.Item name="source" label={<span style={{ color: '#d4d4d4' }}>Source</span>}>
                             <Select options={SOURCES} />
                         </Form.Item>
-                    </Space>
-                    <Form.Item name="expectedCloseDate" label="Expected Close Date" rules={[{ required: true, message: 'Required' }]}>
+                    </div>
+                    <Form.Item name="expectedCloseDate" label={<span style={{ color: '#d4d4d4' }}>Expected Close Date</span>} rules={[{ required: true, message: 'Required' }]}>
                         <Input type="date" />
                     </Form.Item>
-                    <Form.Item name="description" label="Description">
+                    <Form.Item name="description" label={<span style={{ color: '#d4d4d4' }}>Description</span>}>
                         <Input.TextArea rows={3} />
-                    </Form.Item>
-                    <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-                        <Space>
-                            <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                            <Button type="primary" htmlType="submit" loading={isPending}>Create</Button>
-                        </Space>
                     </Form.Item>
                 </Form>
             </Modal>

@@ -8,7 +8,13 @@ import { useClientActions, useClientState } from '@/providers/clientProvider';
 import { useRouter } from 'next/navigation';
 import type { TableProps } from 'antd';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
+
+const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
+const cardStyle: React.CSSProperties = {
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 12,
+};
 
 const ContactsPage: React.FC = () => {
     const { getContacts, createContact, updateContact, deleteContact, setContactPrimary } = useContactActions();
@@ -26,6 +32,7 @@ const ContactsPage: React.FC = () => {
     useEffect(() => {
         getContacts();
         getClients({ pageSize: 100 });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -139,79 +146,87 @@ const ContactsPage: React.FC = () => {
     ];
 
     return (
-        <div>
+        <div style={pageStyle}>
+            {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                <Title level={2} style={{ color: 'white', margin: 0 }}>Contacts</Title>
-                <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>New Contact</Button>
+                <div>
+                    <Title level={2} style={{ color: 'white', margin: 0 }}>Contacts</Title>
+                    <Text style={{ color: '#8c8c8c' }}>Manage people associated with your client accounts</Text>
+                </div>
+                <Button type="primary" icon={<PlusOutlined />} size="large" onClick={openCreate}>New Contact</Button>
             </div>
 
-            <Space style={{ marginBottom: 16 }}>
+            {/* Toolbar */}
+            <div style={{ ...cardStyle, padding: '12px 16px', marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
                 <Input
-                    placeholder="Search by name or email..."
+                    placeholder="Search by name or email…"
                     prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    style={{ width: 280, background: 'rgba(255,255,255,0.05)', borderColor: '#4e545f', color: 'white' }}
+                    style={{ width: 280, background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'white' }}
+                    allowClear
                 />
                 <Select
                     placeholder="Filter by client"
                     allowClear
                     options={clientOptions}
                     onChange={handleClientFilter}
-                    style={{ width: 200 }}
+                    style={{ width: 220 }}
                 />
-            </Space>
+            </div>
 
-            <Table
-                dataSource={filtered}
-                columns={columns}
-                loading={isPending}
-                rowKey="id"
-                onRow={record => ({ onClick: () => router.push(`/dashboard/contacts/${record.id}`), style: { cursor: 'pointer' } })}
-                pagination={{ pageSize: 10 }}
-            />
+            {/* Table */}
+            <div style={cardStyle}>
+                <Table
+                    dataSource={filtered}
+                    columns={columns}
+                    loading={isPending}
+                    rowKey="id"
+                    size="middle"
+                    scroll={{ x: 'max-content' }}
+                    onRow={record => ({ onClick: () => router.push(`/dashboard/contacts/${record.id}`), style: { cursor: 'pointer' } })}
+                    pagination={{ pageSize: 10, showSizeChanger: false }}
+                    style={{ background: 'transparent' }}
+                />
+            </div>
 
             <Modal
-                title={editingContact ? 'Edit Contact' : 'New Contact'}
+                title={<span style={{ color: 'white' }}>{editingContact ? 'Edit Contact' : 'New Contact'}</span>}
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
-                footer={null}
+                onOk={() => form.submit()}
+                okText={editingContact ? 'Save Changes' : 'Create'}
+                confirmLoading={isPending}
                 width={520}
+                styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
                     {!editingContact && (
-                        <Form.Item name="clientId" label="Client" rules={[{ required: true, message: 'Required' }]}>
-                            <Select options={clientOptions} showSearch optionFilterProp="label" />
+                        <Form.Item name="clientId" label={<span style={{ color: '#d4d4d4' }}>Client</span>} rules={[{ required: true, message: 'Required' }]}>
+                            <Select options={clientOptions} showSearch />
                         </Form.Item>
                     )}
-                    <Space.Compact style={{ width: '100%' }}>
-                        <Form.Item name="firstName" label="First Name" rules={[{ required: true, message: 'Required' }]} style={{ flex: 1, marginRight: 8 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <Form.Item name="firstName" label={<span style={{ color: '#d4d4d4' }}>First Name</span>} rules={[{ required: true, message: 'Required' }]}>
                             <Input />
                         </Form.Item>
-                        <Form.Item name="lastName" label="Last Name" rules={[{ required: true, message: 'Required' }]} style={{ flex: 1 }}>
+                        <Form.Item name="lastName" label={<span style={{ color: '#d4d4d4' }}>Last Name</span>} rules={[{ required: true, message: 'Required' }]}>
                             <Input />
                         </Form.Item>
-                    </Space.Compact>
-                    <Form.Item name="email" label="Email" rules={[{ type: 'email', message: 'Invalid email' }]}>
+                    </div>
+                    <Form.Item name="email" label={<span style={{ color: '#d4d4d4' }}>Email</span>} rules={[{ type: 'email', message: 'Invalid email' }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="phoneNumber" label="Phone">
+                    <Form.Item name="phoneNumber" label={<span style={{ color: '#d4d4d4' }}>Phone</span>}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="position" label="Position">
+                    <Form.Item name="position" label={<span style={{ color: '#d4d4d4' }}>Position</span>}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="isPrimaryContact" label="Primary Contact" valuePropName="checked">
+                    <Form.Item name="isPrimaryContact" label={<span style={{ color: '#d4d4d4' }}>Primary Contact</span>} valuePropName="checked">
                         <Switch />
                     </Form.Item>
-                    <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-                        <Space>
-                            <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                            <Button type="primary" htmlType="submit" loading={isPending}>
-                                {editingContact ? 'Save Changes' : 'Create'}
-                            </Button>
-                        </Space>
-                    </Form.Item>
+
                 </Form>
             </Modal>
         </div>

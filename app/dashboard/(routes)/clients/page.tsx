@@ -7,7 +7,13 @@ import { IClientDto, ICreateClientDto, IUpdateClientDto } from '@/providers/clie
 import { useRouter } from 'next/navigation';
 import type { TableProps } from 'antd';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
+
+const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
+const cardStyle: React.CSSProperties = {
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 12,
+};
 
 const CLIENT_TYPES = [
     { value: 0, label: 'Individual' },
@@ -25,6 +31,7 @@ const ClientsPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [form] = Form.useForm();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { getClients(); }, []);
 
     useEffect(() => {
@@ -117,65 +124,73 @@ const ClientsPage: React.FC = () => {
     ];
 
     return (
-        <div>
+        <div style={pageStyle}>
+            {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                <Title level={2} style={{ color: 'white', margin: 0 }}>Clients</Title>
-                <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>New Client</Button>
+                <div>
+                    <Title level={2} style={{ color: 'white', margin: 0 }}>Clients</Title>
+                    <Text style={{ color: '#8c8c8c' }}>Manage your client companies and accounts</Text>
+                </div>
+                <Button type="primary" icon={<PlusOutlined />} size="large" onClick={openCreate}>New Client</Button>
             </div>
 
-            <Input
-                placeholder="Search by name or industry..."
-                prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                style={{ marginBottom: 16, maxWidth: 320, background: 'rgba(255,255,255,0.05)', borderColor: '#4e545f', color: 'white' }}
-            />
+            {/* Toolbar */}
+            <div style={{ ...cardStyle, padding: '12px 16px', marginBottom: 16 }}>
+                <Input
+                    placeholder="Search by name or industry…"
+                    prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    style={{ maxWidth: 320, background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'white' }}
+                    allowClear
+                />
+            </div>
 
-            <Table
-                dataSource={filtered}
-                columns={columns}
-                loading={isPending}
-                rowKey="id"
-                onRow={record => ({ onClick: () => router.push(`/dashboard/clients/${record.id}`), style: { cursor: 'pointer' } })}
-                pagination={{ pageSize: 10 }}
-            />
+            {/* Table */}
+            <div style={cardStyle}>
+                <Table
+                    dataSource={filtered}
+                    columns={columns}
+                    loading={isPending}
+                    rowKey="id"
+                    size="middle"
+                    scroll={{ x: 'max-content' }}
+                    onRow={record => ({ onClick: () => router.push(`/dashboard/clients/${record.id}`), style: { cursor: 'pointer' } })}
+                    pagination={{ pageSize: 10, showSizeChanger: false }}
+                    style={{ background: 'transparent' }}
+                />
+            </div>
 
             <Modal
-                title={editingClient ? 'Edit Client' : 'New Client'}
+                title={<span style={{ color: 'white' }}>{editingClient ? 'Edit Client' : 'New Client'}</span>}
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
-                footer={null}
+                onOk={() => form.submit()}
+                okText={editingClient ? 'Save Changes' : 'Create'}
                 width={520}
+                styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
-                    <Form.Item name="name" label="Company Name" rules={[{ required: true, message: 'Required' }]}>
+                    <Form.Item name="name" label={<span style={{ color: '#d4d4d4' }}>Company Name</span>} rules={[{ required: true, message: 'Required' }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="industry" label="Industry">
+                    <Form.Item name="industry" label={<span style={{ color: '#d4d4d4' }}>Industry</span>}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="companySize" label="Company Size">
+                    <Form.Item name="companySize" label={<span style={{ color: '#d4d4d4' }}>Company Size</span>}>
                         <Input placeholder="e.g. 1–50, 51–200, 200+" />
                     </Form.Item>
-                    <Form.Item name="website" label="Website">
+                    <Form.Item name="website" label={<span style={{ color: '#d4d4d4' }}>Website</span>}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="billingAddress" label="Billing Address">
+                    <Form.Item name="billingAddress" label={<span style={{ color: '#d4d4d4' }}>Billing Address</span>}>
                         <Input.TextArea rows={2} />
                     </Form.Item>
-                    <Form.Item name="taxNumber" label="Tax Number">
+                    <Form.Item name="taxNumber" label={<span style={{ color: '#d4d4d4' }}>Tax Number</span>}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="clientType" label="Client Type">
+                    <Form.Item name="clientType" label={<span style={{ color: '#d4d4d4' }}>Client Type</span>}>
                         <Select options={CLIENT_TYPES} />
-                    </Form.Item>
-                    <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-                        <Space>
-                            <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                            <Button type="primary" htmlType="submit" loading={isPending}>
-                                {editingClient ? 'Save Changes' : 'Create'}
-                            </Button>
-                        </Space>
                     </Form.Item>
                 </Form>
             </Modal>

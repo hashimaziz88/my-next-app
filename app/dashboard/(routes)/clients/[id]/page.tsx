@@ -88,7 +88,7 @@ const ClientDetailPage: React.FC = () => {
                         <Statistic
                             title={<span style={{ color: '#8c8c8c' }}>Contacts</span>}
                             value={clientStats?.totalContacts ?? currentClient.contactsCount ?? 0}
-                            valueStyle={{ color: 'white' }}
+                            style={{ color: 'white' }}
                         />
                     </Card>
                 </Col>
@@ -97,7 +97,7 @@ const ClientDetailPage: React.FC = () => {
                         <Statistic
                             title={<span style={{ color: '#8c8c8c' }}>Opportunities</span>}
                             value={clientStats?.totalOpportunities ?? currentClient.opportunitiesCount ?? 0}
-                            valueStyle={{ color: 'white' }}
+                            style={{ color: 'white' }}
                         />
                     </Card>
                 </Col>
@@ -106,7 +106,7 @@ const ClientDetailPage: React.FC = () => {
                         <Statistic
                             title={<span style={{ color: '#8c8c8c' }}>Contracts</span>}
                             value={clientStats?.totalContracts ?? currentClient.contractsCount ?? 0}
-                            valueStyle={{ color: 'white' }}
+                            style={{ color: 'white' }}
                         />
                     </Card>
                 </Col>
@@ -115,7 +115,7 @@ const ClientDetailPage: React.FC = () => {
                         <Statistic
                             title={<span style={{ color: '#8c8c8c' }}>Active Opportunities</span>}
                             value={clientStats?.activeOpportunities ?? 0}
-                            valueStyle={{ color: '#52c41a' }}
+                            style={{ color: '#52c41a' }}
                         />
                     </Card>
                 </Col>

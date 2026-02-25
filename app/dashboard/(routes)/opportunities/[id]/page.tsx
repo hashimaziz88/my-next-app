@@ -115,7 +115,7 @@ const OpportunityDetailPage: React.FC = () => {
                             title={<span style={{ color: '#8c8c8c' }}>Estimated Value</span>}
                             value={currentOpportunity.estimatedValue ?? 0}
                             prefix={currentOpportunity.currency}
-                            valueStyle={{ color: '#52c41a' }}
+                            style={{ color: '#52c41a' }}
                         />
                     </Card>
                 </Col>
@@ -125,7 +125,7 @@ const OpportunityDetailPage: React.FC = () => {
                             title={<span style={{ color: '#8c8c8c' }}>Probability</span>}
                             value={currentOpportunity.probability ?? 0}
                             suffix="%"
-                            valueStyle={{ color: 'white' }}
+                            style={{ color: 'white' }}
                         />
                     </Card>
                 </Col>
@@ -134,7 +134,7 @@ const OpportunityDetailPage: React.FC = () => {
                         <Statistic
                             title={<span style={{ color: '#8c8c8c' }}>Expected Close</span>}
                             value={currentOpportunity.expectedCloseDate ? new Date(currentOpportunity.expectedCloseDate).toLocaleDateString() : '—'}
-                            valueStyle={{ color: 'white', fontSize: 16 }}
+                            style={{ color: 'white', fontSize: 16 }}
                         />
                     </Card>
                 </Col>
@@ -143,7 +143,7 @@ const OpportunityDetailPage: React.FC = () => {
                         <Statistic
                             title={<span style={{ color: '#8c8c8c' }}>Source</span>}
                             value={currentOpportunity.sourceName || '—'}
-                            valueStyle={{ color: 'white', fontSize: 16 }}
+                            style={{ color: 'white', fontSize: 16 }}
                         />
                     </Card>
                 </Col>
