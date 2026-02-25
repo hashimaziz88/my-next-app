@@ -17,44 +17,28 @@ type FieldType = {
     remember?: boolean;
 };
 
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-
-};
-
-const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-};
-
 const Login: React.FC = () => {
     const { styles } = useStyles();
     const { login } = useAuthActions();
     const { isPending, isError } = useAuthState();
 
-    // 2. Wrap the side effect in useEffect
     useEffect(() => {
         if (isError) {
             message.error('Login failed. Please check your credentials and try again.');
         }
-    }, [isError]); // Only runs when isError changes
-
-    // 3. Keep your early return for the spinner
-    if (isPending) {
-        return <Spinner />;
-    }
-
+    }, [isError]);
 
     const onFinish: FormProps<IUserLoginRequest>['onFinish'] = (values) => {
-        const newUser: IUserLoginRequest = {
-            email: values.email,
-            password: values.password
-        }
-        login(newUser)
-
+        login({ email: values.email, password: values.password });
     };
 
     const onFinishFailed: FormProps<IUserLoginRequest>['onFinishFailed'] = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
+
+    if (isPending) {
+        return <Spinner />;
+    }
     return (
         <div className={styles.container}>
             <div className={styles.backgroundGlow} />
@@ -82,7 +66,7 @@ const Login: React.FC = () => {
                         name="email"
                         rules={[{ required: true, message: 'Please enter your email' }]}
                     >
-                        <Input prefix={<UserOutlined />} placeholder="Enter your username" size="large" />
+                        <Input prefix={<UserOutlined />} placeholder="Enter your email" size="large" />
                     </Form.Item>
 
                     <Form.Item<FieldType>

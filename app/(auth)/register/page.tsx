@@ -1,31 +1,43 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Button, Form, Input, Typography, Divider, FormProps } from 'antd';
+import { Button, Form, Input, Typography, Divider, FormProps, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useStyles } from '../style/style';
 import LogoImage from '@/components/logoImage/LogoImage';
+import { useAuthActions, useAuthState } from '@/providers/authProvider';
+import Spinner from "@/components/spinner/Spinner";
+import { IUserRegisterRequest } from '@/providers/authProvider/context';
 
 const { Text, Title } = Typography;
 
-type FieldType = {
-    username?: string;
-    email?: string;
-    password?: string;
-    remember?: boolean;
-};
-
-
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
-};
-
-const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-};
-
 const Register: React.FC = () => {
     const { styles } = useStyles();
+    const { register } = useAuthActions();
+    const { isPending, isError } = useAuthState();
+
+    useEffect(() => {
+        if (isError) {
+            message.error('Registration failed. Please check your details and try again.');
+        }
+    }, [isError]);
+
+    const onFinish: FormProps<IUserRegisterRequest>['onFinish'] = (values) => {
+        register({
+            firstName: values.firstName,
+            lastName: values.lastName,
+            email: values.email,
+            password: values.password,
+        });
+    };
+
+    const onFinishFailed: FormProps<IUserRegisterRequest>['onFinishFailed'] = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
+
+    if (isPending) {
+        return <Spinner />;
+    }
 
     return (
         <div className={styles.container}>
@@ -48,26 +60,39 @@ const Register: React.FC = () => {
                     onFinishFailed={onFinishFailed}
                 >
                     <Form.Item
-                        label="Username"
-                        name="username"
-                        rules={[{ required: true, message: 'Please enter your username' }]}>
-                        <Input prefix={<UserOutlined />} placeholder="johndoe" size="large" />
+                        label="First Name"
+                        name="firstName"
+                        rules={[{ required: true, message: 'Please enter your first name' }]}
+                    >
+                        <Input prefix={<UserOutlined />} placeholder="John" size="large" />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Last Name"
+                        name="lastName"
+                        rules={[{ required: true, message: 'Please enter your last name' }]}
+                    >
+                        <Input prefix={<UserOutlined />} placeholder="Doe" size="large" />
                     </Form.Item>
 
                     <Form.Item
                         label="Email Address"
                         name="email"
-                        rules={[{ required: true, message: 'Please enter your email address' }]}>
+                        rules={[
+                            { required: true, message: 'Please enter your email address' },
+                            { type: 'email', message: 'Please enter a valid email address' },
+                        ]}
+                    >
                         <Input prefix={<MailOutlined />} placeholder="name@company.com" size="large" />
                     </Form.Item>
 
                     <Form.Item
                         label="Password"
                         name="password"
-                        rules={[{ required: true, message: 'Please enter your password' }]}>
+                        rules={[{ required: true, message: 'Please enter your password' }]}
+                    >
                         <Input.Password prefix={<LockOutlined />} placeholder="••••••••" size="large" />
                     </Form.Item>
-
 
                     <Form.Item>
                         <Button type="primary" htmlType="submit" size="large" block>
@@ -87,7 +112,7 @@ const Register: React.FC = () => {
                     </div>
                 </Form>
             </div>
-        </div >
+        </div>
     );
 };
 

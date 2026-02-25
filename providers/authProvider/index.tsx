@@ -1,6 +1,6 @@
 "use client"
 import React, { useReducer, useContext, useEffect } from "react";
-import { INITIAL_STATE, AuthActionContext, AuthStateContext, IUserLoginRequest, IUserRegisterRequest, IUserLoginResponse } from "./context";
+import { INITIAL_STATE, AuthActionContext, AuthStateContext, IUserLoginRequest, IUserRegisterRequest } from "./context";
 import { AuthReducer } from "./reducer";
 import {
     loginPending, loginSuccess, loginError,
@@ -9,60 +9,33 @@ import {
     getMePending, getMeSuccess, getMeError
 } from "./actions";
 import { axiosInstance } from "../../utils/axiosInstance";
-import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
-
-const BASE_URL: string = process.env.NEXT_PUBLIC_API_LINK + "/auth";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [state, dispatch] = useReducer(AuthReducer, INITIAL_STATE);
-    const instance = axiosInstance();
     const router = useRouter();
 
     const login = async (payload: IUserLoginRequest) => {
         dispatch(loginPending());
-        const endpoint = `${BASE_URL}/login`;
-        console.log(payload);
-
-        await instance.post(endpoint, payload)
+        await axiosInstance().post("/api/Auth/login", payload)
             .then((response) => {
                 dispatch(loginSuccess(response.data));
-                console.log(response.data);
-
                 sessionStorage.setItem('token', response.data.token);
-                const token = jwtDecode(response.data.token);
-                console.log(token);
-
-                // sessionStorage.setItem('userRole', token);
-                // sessionStorage.setItem('userId', token)
                 router.push("/dashboard");
-
-            }).catch((error) => {
+            })
+            .catch((error) => {
                 dispatch(loginError());
                 console.log(error.message);
-            })
+            });
     };
 
     const register = async (payload: IUserRegisterRequest) => {
         dispatch(registerPending());
-        const endpoint = `${BASE_URL}/register`;
-        await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        })
-            .then(response => {
-                if (!response.ok) throw new Error("Registration failed");
-                return response.json();
-            })
-            .then((data: IUserLoginResponse) => {
-                if (data.token) {
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("user", JSON.stringify(data));
-                    dispatch(registerSuccess(data));
-                } else {
-                    dispatch(registerError());
-                }
+        await axiosInstance().post("/api/Auth/register", payload)
+            .then((response) => {
+                dispatch(registerSuccess(response.data));
+                sessionStorage.setItem('token', response.data.token);
+                router.push("/dashboard");
             })
             .catch((error) => {
                 console.error(error);
@@ -74,8 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dispatch(logoutPending());
         await Promise.resolve()
             .then(() => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
+                sessionStorage.removeItem("token");
                 dispatch(logoutSuccess());
             })
             .catch((error) => {
@@ -85,30 +57,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const getMe = async () => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (token) {
             dispatch(getMePending());
-            const endpoint = `${BASE_URL}/me`;
-            await fetch(endpoint, {
-                headers: { "Authorization": `Bearer ${token}` }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Token validation failed");
-                    }
-                    const userStr = localStorage.getItem('user');
-                    if (userStr) {
-                        const user: IUserLoginResponse = JSON.parse(userStr);
-                        dispatch(getMeSuccess(user));
-                    } else {
-                        throw new Error("User data not found in storage");
-                    }
+            await axiosInstance().get("/api/Auth/me")
+                .then((response) => {
+                    dispatch(getMeSuccess(response.data));
                 })
                 .catch((error) => {
                     console.error(error);
-                    // If token is invalid or user data is missing, logout
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
+                    sessionStorage.removeItem("token");
                     dispatch(getMeError());
                 });
         }

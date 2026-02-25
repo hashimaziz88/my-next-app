@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -9,6 +8,9 @@ import {
     MenuUnfoldOutlined,
     UserOutlined,
     DashboardOutlined,
+    TeamOutlined,
+    ContactsOutlined,
+    RiseOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
 import { useStyles } from './style/style';
@@ -23,16 +25,11 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
     const pathname = usePathname();
 
     const menuItems = [
-        {
-            key: '/dashboard',
-            icon: <DashboardOutlined />,
-            label: 'Dashboard',
-        },
-        {
-            key: '/dashboard/profile',
-            icon: <UserOutlined />,
-            label: 'Profile',
-        },
+        { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+        { key: '/dashboard/clients', icon: <TeamOutlined />, label: 'Clients' },
+        { key: '/dashboard/contacts', icon: <ContactsOutlined />, label: 'Contacts' },
+        { key: '/dashboard/opportunities', icon: <RiseOutlined />, label: 'Opportunities' },
+        { key: '/dashboard/profile', icon: <UserOutlined />, label: 'Profile' },
     ];
 
     return (
