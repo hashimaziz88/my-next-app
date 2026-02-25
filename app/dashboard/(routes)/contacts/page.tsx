@@ -7,14 +7,10 @@ import { IContactDto, ICreateContactDto, IUpdateContactDto } from '@/providers/c
 import { useClientActions, useClientState } from '@/providers/clientProvider';
 import { useRouter } from 'next/navigation';
 import type { TableProps } from 'antd';
+import { useStyles } from '@/app/dashboard/(routes)/_styles/style';
+import FormLabel from '@/app/dashboard/(routes)/_components/FormLabel';
 
 const { Title, Text } = Typography;
-
-const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
-const cardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 12,
-};
 
 const ContactsPage: React.FC = () => {
     const { getContacts, createContact, updateContact, deleteContact, setContactPrimary } = useContactActions();
@@ -22,6 +18,7 @@ const ContactsPage: React.FC = () => {
     const { getClients } = useClientActions();
     const { pagedResult: clientsResult } = useClientState();
     const router = useRouter();
+    const { styles } = useStyles();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContact, setEditingContact] = useState<IContactDto | null>(null);
@@ -94,7 +91,7 @@ const ContactsPage: React.FC = () => {
             dataIndex: 'fullName',
             render: (text, record) => (
                 <Space>
-                    <span style={{ color: 'white', fontWeight: 500 }}>{text}</span>
+                    <span className={styles.primaryText}>{text}</span>
                     {record.isPrimaryContact && <Tag color="gold">Primary</Tag>}
                 </Space>
             ),
@@ -102,17 +99,17 @@ const ContactsPage: React.FC = () => {
         {
             title: 'Email',
             dataIndex: 'email',
-            render: text => <span style={{ color: '#8c8c8c' }}>{text || '—'}</span>,
+            render: text => <span className={styles.mutedText}>{text || '—'}</span>,
         },
         {
             title: 'Phone',
             dataIndex: 'phoneNumber',
-            render: text => <span style={{ color: '#8c8c8c' }}>{text || '—'}</span>,
+            render: text => <span className={styles.mutedText}>{text || '—'}</span>,
         },
         {
             title: 'Position',
             dataIndex: 'position',
-            render: text => <span style={{ color: '#8c8c8c' }}>{text || '—'}</span>,
+            render: text => <span className={styles.mutedText}>{text || '—'}</span>,
         },
         {
             title: 'Client',
@@ -129,16 +126,16 @@ const ContactsPage: React.FC = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space onClick={e => e.stopPropagation()}>
-                    <Button size="small" type="text" icon={<EyeOutlined />} style={{ color: '#1890ff' }}
+                    <Button size="small" type="text" icon={<EyeOutlined />} className={styles.btnView}
                         onClick={() => router.push(`/dashboard/contacts/${record.id}`)} />
-                    <Button size="small" type="text" icon={<EditOutlined />} style={{ color: '#52c41a' }}
+                    <Button size="small" type="text" icon={<EditOutlined />} className={styles.btnEdit}
                         onClick={e => openEdit(record, e)} />
                     {!record.isPrimaryContact && (
-                        <Button size="small" type="text" icon={<StarOutlined />} style={{ color: '#faad14' }}
+                        <Button size="small" type="text" icon={<StarOutlined />} className={styles.btnWarn}
                             onClick={e => handleSetPrimary(record.id, e)} title="Set as primary" />
                     )}
                     <Popconfirm title="Delete this contact?" onConfirm={() => handleDelete(record.id)} okText="Yes" cancelText="No">
-                        <Button size="small" type="text" icon={<DeleteOutlined />} style={{ color: '#ff4d4f' }} />
+                        <Button size="small" type="text" icon={<DeleteOutlined />} className={styles.btnDelete} />
                     </Popconfirm>
                 </Space>
             ),
@@ -146,24 +143,25 @@ const ContactsPage: React.FC = () => {
     ];
 
     return (
-        <div style={pageStyle}>
+        <div className={styles.page}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div className={styles.pageHeader}>
                 <div>
-                    <Title level={2} style={{ color: 'white', margin: 0 }}>Contacts</Title>
-                    <Text style={{ color: '#8c8c8c' }}>Manage people associated with your client accounts</Text>
+                    <Title level={2} className={styles.pageTitle}>Contacts</Title>
+                    <Text className={styles.pageSubtitle}>Manage people associated with your client accounts</Text>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} size="large" onClick={openCreate}>New Contact</Button>
             </div>
 
             {/* Toolbar */}
-            <div style={{ ...cardStyle, padding: '12px 16px', marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div className={`${styles.toolbar} ${styles.toolbarRow}`}>
                 <Input
                     placeholder="Search by name or email…"
                     prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    style={{ width: 280, background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'white' }}
+                    className={styles.searchInput}
+                    style={{ width: 280 }}
                     allowClear
                 />
                 <Select
@@ -176,7 +174,7 @@ const ContactsPage: React.FC = () => {
             </div>
 
             {/* Table */}
-            <div style={cardStyle}>
+            <div className={styles.tableCard}>
                 <Table
                     dataSource={filtered}
                     columns={columns}
@@ -191,7 +189,7 @@ const ContactsPage: React.FC = () => {
             </div>
 
             <Modal
-                title={<span style={{ color: 'white' }}>{editingContact ? 'Edit Contact' : 'New Contact'}</span>}
+                title={<span className={styles.pageTitle}>{editingContact ? 'Edit Contact' : 'New Contact'}</span>}
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 onOk={() => form.submit()}
@@ -202,28 +200,28 @@ const ContactsPage: React.FC = () => {
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
                     {!editingContact && (
-                        <Form.Item name="clientId" label={<span style={{ color: '#d4d4d4' }}>Client</span>} rules={[{ required: true, message: 'Required' }]}>
+                        <Form.Item name="clientId" label={<FormLabel text="Client" />} rules={[{ required: true, message: 'Required' }]}>
                             <Select options={clientOptions} showSearch />
                         </Form.Item>
                     )}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <Form.Item name="firstName" label={<span style={{ color: '#d4d4d4' }}>First Name</span>} rules={[{ required: true, message: 'Required' }]}>
+                    <div className={styles.formGrid}>
+                        <Form.Item name="firstName" label={<FormLabel text="First Name" />} rules={[{ required: true, message: 'Required' }]}>
                             <Input />
                         </Form.Item>
-                        <Form.Item name="lastName" label={<span style={{ color: '#d4d4d4' }}>Last Name</span>} rules={[{ required: true, message: 'Required' }]}>
+                        <Form.Item name="lastName" label={<FormLabel text="Last Name" />} rules={[{ required: true, message: 'Required' }]}>
                             <Input />
                         </Form.Item>
                     </div>
-                    <Form.Item name="email" label={<span style={{ color: '#d4d4d4' }}>Email</span>} rules={[{ type: 'email', message: 'Invalid email' }]}>
+                    <Form.Item name="email" label={<FormLabel text="Email" />} rules={[{ type: 'email', message: 'Invalid email' }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="phoneNumber" label={<span style={{ color: '#d4d4d4' }}>Phone</span>}>
+                    <Form.Item name="phoneNumber" label={<FormLabel text="Phone" />}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="position" label={<span style={{ color: '#d4d4d4' }}>Position</span>}>
+                    <Form.Item name="position" label={<FormLabel text="Position" />}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="isPrimaryContact" label={<span style={{ color: '#d4d4d4' }}>Primary Contact</span>} valuePropName="checked">
+                    <Form.Item name="isPrimaryContact" label={<FormLabel text="Primary Contact" />} valuePropName="checked">
                         <Switch />
                     </Form.Item>
 

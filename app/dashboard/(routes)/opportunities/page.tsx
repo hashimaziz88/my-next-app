@@ -7,14 +7,11 @@ import { IOpportunityDto, ICreateOpportunityDto } from '@/providers/opportunityP
 import { useClientActions, useClientState } from '@/providers/clientProvider';
 import { useRouter } from 'next/navigation';
 import type { TableProps } from 'antd';
+import { useStyles as usePageStyles } from '@/app/dashboard/(routes)/_styles/style';
+import { useStyles as useKanbanStyles } from '@/app/dashboard/(routes)/opportunities/style/style';
+import FormLabel from '@/app/dashboard/(routes)/_components/FormLabel';
 
 const { Title, Text } = Typography;
-
-const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
-const cardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 12,
-};
 
 const STAGES: { value: number; label: string; color: string }[] = [
     { value: 0, label: 'Lead', color: '#1890ff' },
@@ -41,6 +38,8 @@ const OpportunitiesPage: React.FC = () => {
     const { getClients } = useClientActions();
     const { pagedResult: clientsResult } = useClientState();
     const router = useRouter();
+    const { styles } = usePageStyles();
+    const { styles: kanban } = useKanbanStyles();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -86,7 +85,7 @@ const OpportunitiesPage: React.FC = () => {
         {
             title: 'Title',
             dataIndex: 'title',
-            render: text => <span style={{ color: 'white', fontWeight: 500 }}>{text}</span>,
+            render: text => <span className={styles.primaryText}>{text}</span>,
         },
         {
             title: 'Client',
@@ -102,7 +101,7 @@ const OpportunitiesPage: React.FC = () => {
             title: 'Value',
             dataIndex: 'estimatedValue',
             render: (val, record) => (
-                <span style={{ color: '#52c41a', fontWeight: 500 }}>
+                <span className={styles.btnSuccess}>
                     {record.currency} {(val ?? 0).toLocaleString()}
                 </span>
             ),
@@ -110,70 +109,63 @@ const OpportunitiesPage: React.FC = () => {
         {
             title: 'Probability',
             dataIndex: 'probability',
-            render: val => <span style={{ color: '#8c8c8c' }}>{val ?? 0}%</span>,
+            render: val => <span className={styles.mutedText}>{val ?? 0}%</span>,
         },
         {
             title: 'Close Date',
             dataIndex: 'expectedCloseDate',
-            render: date => <span style={{ color: '#8c8c8c' }}>{date ? new Date(date).toLocaleDateString() : '—'}</span>,
+            render: date => <span className={styles.mutedText}>{date ? new Date(date).toLocaleDateString() : '—'}</span>,
         },
         {
             title: 'Actions',
             key: 'actions',
             render: (_, record) => (
                 <Space onClick={e => e.stopPropagation()}>
-                    <Button size="small" type="text" icon={<EyeOutlined />} style={{ color: '#1890ff' }}
+                    <Button size="small" type="text" icon={<EyeOutlined />} className={styles.btnView}
                         onClick={() => router.push(`/dashboard/opportunities/${record.id}`)} />
                     <Popconfirm title="Delete this opportunity?" onConfirm={() => handleDelete(record.id)} okText="Yes" cancelText="No">
-                        <Button size="small" type="text" icon={<DeleteOutlined />} style={{ color: '#ff4d4f' }} />
+                        <Button size="small" type="text" icon={<DeleteOutlined />} className={styles.btnDelete} />
                     </Popconfirm>
                 </Space>
             ),
         },
     ];
 
-    const KanbanView = () => (
-        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 16, minHeight: 400 }}>
+    const kanbanBoard = (
+        <div className={kanban.board}>
             {STAGES.map(stage => {
                 const stageOpps = filtered.filter(o => o.stage === stage.value);
                 const total = stageOpps.reduce((sum, o) => sum + (o.estimatedValue ?? 0), 0);
                 return (
-                    <div key={stage.value} style={{ minWidth: 240, flex: '0 0 240px' }}>
-                        <div style={{
-                            borderTop: `3px solid ${stage.color}`,
-                            background: 'rgba(255,255,255,0.04)',
-                            borderRadius: '8px 8px 0 0',
-                            padding: '10px 14px',
-                            marginBottom: 8,
-                        }}>
+                    <div key={stage.value} className={kanban.column}>
+                        <div
+                            className={kanban.columnHeader}
+                            style={{ borderTop: `3px solid ${stage.color}` }}
+                        >
                             <span style={{ color: stage.color, fontWeight: 600 }}>{stage.label}</span>
-                            <span style={{ color: '#8c8c8c', marginLeft: 8, fontSize: 12 }}>({stageOpps.length})</span>
+                            <span className={kanban.oppCardMeta} style={{ marginLeft: 8 }}>({stageOpps.length})</span>
                             {total > 0 && (
-                                <div style={{ color: '#52c41a', fontSize: 11, marginTop: 2 }}>
+                                <div className={kanban.oppCardValue} style={{ fontSize: 11, marginTop: 2 }}>
                                     R {total.toLocaleString()}
                                 </div>
                             )}
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div className={kanban.columnBody}>
                             {stageOpps.map(opp => (
                                 <Card
                                     key={opp.id}
                                     size="small"
                                     onClick={() => router.push(`/dashboard/opportunities/${opp.id}`)}
-                                    style={{
-                                        background: 'rgba(255,255,255,0.06)',
-                                        border: '1px solid rgba(255,255,255,0.08)',
-                                        cursor: 'pointer',
-                                    }}
+                                    className={kanban.oppCard}
                                     styles={{ body: { padding: '10px 12px' } }}
                                 >
-                                    <div style={{ color: 'white', fontWeight: 500, fontSize: 13, marginBottom: 4 }}>{opp.title}</div>
-                                    <div style={{ color: '#8c8c8c', fontSize: 12, marginBottom: 4 }}>{opp.clientName}</div>
+                                    <div className={kanban.oppCardTitle}>{opp.title}</div>
+                                    <div className={kanban.oppCardMeta} style={{ marginBottom: 4 }}>{opp.clientName}</div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ color: '#52c41a', fontSize: 12, fontWeight: 500 }}>
+                                        <span className={kanban.oppCardValue} style={{ fontSize: 12 }}>
                                             {opp.currency} {(opp.estimatedValue ?? 0).toLocaleString()}
                                         </span>
-                                        <span style={{ color: '#8c8c8c', fontSize: 11 }}>{opp.probability ?? 0}%</span>
+                                        <span className={kanban.oppCardMeta} style={{ fontSize: 11 }}>{opp.probability ?? 0}%</span>
                                     </div>
                                 </Card>
                             ))}
@@ -185,12 +177,12 @@ const OpportunitiesPage: React.FC = () => {
     );
 
     return (
-        <div style={pageStyle}>
+        <div className={styles.page}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div className={styles.pageHeader}>
                 <div>
-                    <Title level={2} style={{ color: 'white', margin: 0 }}>Opportunities</Title>
-                    <Text style={{ color: '#8c8c8c' }}>Track your sales pipeline and deals</Text>
+                    <Title level={2} className={styles.pageTitle}>Opportunities</Title>
+                    <Text className={styles.pageSubtitle}>Track your sales pipeline and deals</Text>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => { form.resetFields(); setIsModalOpen(true); }}>
                     New Opportunity
@@ -198,13 +190,14 @@ const OpportunitiesPage: React.FC = () => {
             </div>
 
             {/* Toolbar */}
-            <div style={{ ...cardStyle, padding: '12px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <div className={`${styles.toolbar} ${styles.toolbarRow}`} style={{ justifyContent: 'space-between' }}>
                 <Input
                     placeholder="Search by title or client…"
                     prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    style={{ maxWidth: 300, background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'white' }}
+                    className={styles.searchInput}
+                    style={{ maxWidth: 300 }}
                     allowClear
                 />
                 <Segmented
@@ -218,9 +211,9 @@ const OpportunitiesPage: React.FC = () => {
             </div>
 
             {viewMode === 'kanban' ? (
-                <KanbanView />
+                kanbanBoard
             ) : (
-                <div style={cardStyle}>
+                <div className={styles.tableCard}>
                     <Table
                         dataSource={filtered}
                         columns={columns}
@@ -236,7 +229,7 @@ const OpportunitiesPage: React.FC = () => {
             )}
 
             <Modal
-                title={<span style={{ color: 'white' }}>New Opportunity</span>}
+                title={<span className={styles.pageTitle}>New Opportunity</span>}
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 onOk={() => form.submit()}
@@ -246,30 +239,30 @@ const OpportunitiesPage: React.FC = () => {
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
-                    <Form.Item name="title" label={<span style={{ color: '#d4d4d4' }}>Title</span>} rules={[{ required: true, message: 'Required' }]}>
+                    <Form.Item name="title" label={<FormLabel text="Title" />} rules={[{ required: true, message: 'Required' }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="clientId" label={<span style={{ color: '#d4d4d4' }}>Client</span>} rules={[{ required: true, message: 'Required' }]}>
+                    <Form.Item name="clientId" label={<FormLabel text="Client" />} rules={[{ required: true, message: 'Required' }]}>
                         <Select options={clientOptions} showSearch />
                     </Form.Item>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <Form.Item name="estimatedValue" label={<span style={{ color: '#d4d4d4' }}>Estimated Value</span>} rules={[{ required: true, message: 'Required' }]}>
+                    <div className={styles.formGrid}>
+                        <Form.Item name="estimatedValue" label={<FormLabel text="Estimated Value" />} rules={[{ required: true, message: 'Required' }]}>
                             <InputNumber style={{ width: '100%' }} min={0} />
                         </Form.Item>
-                        <Form.Item name="currency" label={<span style={{ color: '#d4d4d4' }}>Currency</span>} initialValue="ZAR">
+                        <Form.Item name="currency" label={<FormLabel text="Currency" />} initialValue="ZAR">
                             <Input />
                         </Form.Item>
-                        <Form.Item name="probability" label={<span style={{ color: '#d4d4d4' }}>Probability (%)</span>}>
+                        <Form.Item name="probability" label={<FormLabel text="Probability (%)" />}>
                             <InputNumber style={{ width: '100%' }} min={0} max={100} />
                         </Form.Item>
-                        <Form.Item name="source" label={<span style={{ color: '#d4d4d4' }}>Source</span>}>
+                        <Form.Item name="source" label={<FormLabel text="Source" />}>
                             <Select options={SOURCES} />
                         </Form.Item>
                     </div>
-                    <Form.Item name="expectedCloseDate" label={<span style={{ color: '#d4d4d4' }}>Expected Close Date</span>} rules={[{ required: true, message: 'Required' }]}>
+                    <Form.Item name="expectedCloseDate" label={<FormLabel text="Expected Close Date" />} rules={[{ required: true, message: 'Required' }]}>
                         <Input type="date" />
                     </Form.Item>
-                    <Form.Item name="description" label={<span style={{ color: '#d4d4d4' }}>Description</span>}>
+                    <Form.Item name="description" label={<FormLabel text="Description" />}>
                         <Input.TextArea rows={3} />
                     </Form.Item>
                 </Form>

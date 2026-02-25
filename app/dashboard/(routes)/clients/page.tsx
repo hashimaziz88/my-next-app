@@ -6,14 +6,10 @@ import { useClientActions, useClientState } from '@/providers/clientProvider';
 import { IClientDto, ICreateClientDto, IUpdateClientDto } from '@/providers/clientProvider/context';
 import { useRouter } from 'next/navigation';
 import type { TableProps } from 'antd';
+import { useStyles } from '@/app/dashboard/(routes)/_styles/style';
+import FormLabel from '@/app/dashboard/(routes)/_components/FormLabel';
 
 const { Title, Text } = Typography;
-
-const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
-const cardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 12,
-};
 
 const CLIENT_TYPES = [
     { value: 0, label: 'Individual' },
@@ -25,6 +21,7 @@ const ClientsPage: React.FC = () => {
     const { getClients, createClient, updateClient, deleteClient } = useClientActions();
     const { pagedResult, isPending, isError } = useClientState();
     const router = useRouter();
+    const { styles } = useStyles();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingClient, setEditingClient] = useState<IClientDto | null>(null);
@@ -77,17 +74,17 @@ const ClientsPage: React.FC = () => {
         {
             title: 'Name',
             dataIndex: 'name',
-            render: text => <span style={{ color: 'white', fontWeight: 500 }}>{text}</span>,
+            render: text => <span className={styles.primaryText}>{text}</span>,
         },
         {
             title: 'Industry',
             dataIndex: 'industry',
-            render: text => text ? <Tag color="blue">{text}</Tag> : <span style={{ color: '#8c8c8c' }}>—</span>,
+            render: text => text ? <Tag color="blue">{text}</Tag> : <span className={styles.mutedText}>—</span>,
         },
         {
             title: 'Company Size',
             dataIndex: 'companySize',
-            render: text => <span style={{ color: '#8c8c8c' }}>{text || '—'}</span>,
+            render: text => <span className={styles.mutedText}>{text || '—'}</span>,
         },
         {
             title: 'Contacts',
@@ -111,12 +108,12 @@ const ClientsPage: React.FC = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space onClick={e => e.stopPropagation()}>
-                    <Button size="small" type="text" icon={<EyeOutlined />} style={{ color: '#1890ff' }}
+                    <Button size="small" type="text" icon={<EyeOutlined />} className={styles.btnView}
                         onClick={() => router.push(`/dashboard/clients/${record.id}`)} />
-                    <Button size="small" type="text" icon={<EditOutlined />} style={{ color: '#52c41a' }}
+                    <Button size="small" type="text" icon={<EditOutlined />} className={styles.btnEdit}
                         onClick={e => openEdit(record, e)} />
                     <Popconfirm title="Delete this client?" onConfirm={() => handleDelete(record.id)} okText="Yes" cancelText="No">
-                        <Button size="small" type="text" icon={<DeleteOutlined />} style={{ color: '#ff4d4f' }} />
+                        <Button size="small" type="text" icon={<DeleteOutlined />} className={styles.btnDelete} />
                     </Popconfirm>
                 </Space>
             ),
@@ -124,30 +121,31 @@ const ClientsPage: React.FC = () => {
     ];
 
     return (
-        <div style={pageStyle}>
+        <div className={styles.page}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div className={styles.pageHeader}>
                 <div>
-                    <Title level={2} style={{ color: 'white', margin: 0 }}>Clients</Title>
-                    <Text style={{ color: '#8c8c8c' }}>Manage your client companies and accounts</Text>
+                    <Title level={2} className={styles.pageTitle}>Clients</Title>
+                    <Text className={styles.pageSubtitle}>Manage your client companies and accounts</Text>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} size="large" onClick={openCreate}>New Client</Button>
             </div>
 
             {/* Toolbar */}
-            <div style={{ ...cardStyle, padding: '12px 16px', marginBottom: 16 }}>
+            <div className={styles.toolbar}>
                 <Input
                     placeholder="Search by name or industry…"
                     prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    style={{ maxWidth: 320, background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'white' }}
+                    className={styles.searchInput}
+                    style={{ maxWidth: 320 }}
                     allowClear
                 />
             </div>
 
             {/* Table */}
-            <div style={cardStyle}>
+            <div className={styles.tableCard}>
                 <Table
                     dataSource={filtered}
                     columns={columns}
@@ -162,7 +160,7 @@ const ClientsPage: React.FC = () => {
             </div>
 
             <Modal
-                title={<span style={{ color: 'white' }}>{editingClient ? 'Edit Client' : 'New Client'}</span>}
+                title={<span className={styles.pageTitle}>{editingClient ? 'Edit Client' : 'New Client'}</span>}
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 onOk={() => form.submit()}
@@ -171,25 +169,25 @@ const ClientsPage: React.FC = () => {
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
-                    <Form.Item name="name" label={<span style={{ color: '#d4d4d4' }}>Company Name</span>} rules={[{ required: true, message: 'Required' }]}>
+                    <Form.Item name="name" label={<FormLabel text="Company Name" />} rules={[{ required: true, message: 'Required' }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="industry" label={<span style={{ color: '#d4d4d4' }}>Industry</span>}>
+                    <Form.Item name="industry" label={<FormLabel text="Industry" />}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="companySize" label={<span style={{ color: '#d4d4d4' }}>Company Size</span>}>
+                    <Form.Item name="companySize" label={<FormLabel text="Company Size" />}>
                         <Input placeholder="e.g. 1–50, 51–200, 200+" />
                     </Form.Item>
-                    <Form.Item name="website" label={<span style={{ color: '#d4d4d4' }}>Website</span>}>
+                    <Form.Item name="website" label={<FormLabel text="Website" />}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="billingAddress" label={<span style={{ color: '#d4d4d4' }}>Billing Address</span>}>
+                    <Form.Item name="billingAddress" label={<FormLabel text="Billing Address" />}>
                         <Input.TextArea rows={2} />
                     </Form.Item>
-                    <Form.Item name="taxNumber" label={<span style={{ color: '#d4d4d4' }}>Tax Number</span>}>
+                    <Form.Item name="taxNumber" label={<FormLabel text="Tax Number" />}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="clientType" label={<span style={{ color: '#d4d4d4' }}>Client Type</span>}>
+                    <Form.Item name="clientType" label={<FormLabel text="Client Type" />}>
                         <Select options={CLIENT_TYPES} />
                     </Form.Item>
                 </Form>

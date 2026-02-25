@@ -14,6 +14,10 @@ import {
     CalendarOutlined,
     FileTextOutlined,
     FolderOutlined,
+    DollarOutlined,
+    FileDoneOutlined,
+    FileProtectOutlined,
+    BarChartOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu } from 'antd';
 import { useStyles } from './style/style';
@@ -35,6 +39,10 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
         { key: '/dashboard/activities', icon: <CalendarOutlined />, label: 'Activities' },
         { key: '/dashboard/notes', icon: <FileTextOutlined />, label: 'Notes' },
         { key: '/dashboard/documents', icon: <FolderOutlined />, label: 'Documents' },
+        { key: '/dashboard/pricing-requests', icon: <DollarOutlined />, label: 'Pricing Requests' },
+        { key: '/dashboard/proposals', icon: <FileDoneOutlined />, label: 'Proposals' },
+        { key: '/dashboard/contracts', icon: <FileProtectOutlined />, label: 'Contracts' },
+        { key: '/dashboard/reports', icon: <BarChartOutlined />, label: 'Reports' },
         { key: '/dashboard/profile', icon: <UserOutlined />, label: 'Profile' },
     ];
 

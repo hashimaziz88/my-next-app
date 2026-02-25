@@ -73,16 +73,24 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const getUpcomingActivities = async (daysAhead?: number) => {
         const instance = axiosInstance();
         dispatch(getUpcomingActivitiesPending());
-        await instance.get(`${BASE_URL}/api/Activities/upcoming`, { params: { daysAhead } })
-            .then((response) => { dispatch(getUpcomingActivitiesSuccess(response.data)); })
+        await instance.get(`${BASE_URL}/api/Activities/upcoming`, { params: { daysAhead, pageSize: 100 } })
+            .then((response) => {
+                const data = response.data;
+                const arr = Array.isArray(data) ? data : (data?.items ?? []);
+                dispatch(getUpcomingActivitiesSuccess(arr));
+            })
             .catch(() => { dispatch(getUpcomingActivitiesError()); });
     };
 
     const getOverdueActivities = async () => {
         const instance = axiosInstance();
         dispatch(getOverdueActivitiesPending());
-        await instance.get(`${BASE_URL}/api/Activities/overdue`)
-            .then((response) => { dispatch(getOverdueActivitiesSuccess(response.data)); })
+        await instance.get(`${BASE_URL}/api/Activities/overdue`, { params: { pageSize: 100 } })
+            .then((response) => {
+                const data = response.data;
+                const arr = Array.isArray(data) ? data : (data?.items ?? []);
+                dispatch(getOverdueActivitiesSuccess(arr));
+            })
             .catch(() => { dispatch(getOverdueActivitiesError()); });
     };
 

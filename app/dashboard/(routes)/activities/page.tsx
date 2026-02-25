@@ -9,6 +9,7 @@ import {
     CloseOutlined, EyeOutlined, SearchOutlined,
 } from '@ant-design/icons';
 import { useActivityActions, useActivityState } from '@/providers/activityProvider';
+import { useAuthState } from '@/providers/authProvider';
 import {
     IActivityDto, ICreateActivityDto, IUpdateActivityDto, ICompleteActivityDto,
 } from '@/providers/activityProvider/context';
@@ -16,6 +17,9 @@ import { useOpportunityActions, useOpportunityState } from '@/providers/opportun
 import { useClientActions, useClientState } from '@/providers/clientProvider';
 import dayjs from 'dayjs';
 import type { TableProps } from 'antd';
+import { useStyles } from '@/app/dashboard/(routes)/_styles/style';
+import { useActivityStyles } from '@/app/dashboard/(routes)/activities/style/style';
+import FormLabel from '@/app/dashboard/(routes)/_components/FormLabel';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -65,18 +69,16 @@ const priorityTag = (priority: number, name: string) => {
     return <Tag color={p?.color ?? 'default'}>{name || p?.label}</Tag>;
 };
 
-const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
-const cardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 12,
-};
-
 /* ─── component ───────────────────────────────────────────────────────── */
 const ActivitiesPage: React.FC = () => {
     const { getActivities, getMyActivities, getUpcomingActivities, getOverdueActivities,
         createActivity, updateActivity, deleteActivity, completeActivity, cancelActivity,
     } = useActivityActions();
     const { pagedResult, upcomingActivities, overdueActivities, isPending, isError } = useActivityState();
+    const { user } = useAuthState();
+
+    const { styles } = useStyles();
+    const { styles: act, cx } = useActivityStyles();
 
     const { getOpportunities } = useOpportunityActions();
     const { pagedResult: oppsResult } = useOpportunityState();
@@ -113,6 +115,8 @@ const ActivitiesPage: React.FC = () => {
         setActiveTab(key);
         if (key === 'all') getActivities({ pageSize: 100 });
         else if (key === 'mine') getMyActivities();
+        else if (key === 'upcoming') getUpcomingActivities(14);
+        else if (key === 'overdue') getOverdueActivities();
     };
 
     /* CRUD helpers */
@@ -120,6 +124,7 @@ const ActivitiesPage: React.FC = () => {
         await createActivity({
             ...values,
             dueDate: values.dueDate ? dayjs(values.dueDate).toISOString() : values.dueDate,
+            assignedToId: values.assignedToId ?? user?.userId,
         });
         setIsCreateOpen(false);
         createForm.resetFields();
@@ -180,9 +185,10 @@ const ActivitiesPage: React.FC = () => {
     };
 
     /* data for current tab */
-    const allList = pagedResult?.items ?? [];
-    const upcomingList = upcomingActivities ?? [];
-    const overdueList = overdueActivities ?? [];
+    const rawItems = pagedResult?.items;
+    const allList: IActivityDto[] = Array.isArray(rawItems) ? rawItems : [];
+    const upcomingList = Array.isArray(upcomingActivities) ? upcomingActivities : [];
+    const overdueList = Array.isArray(overdueActivities) ? overdueActivities : [];
 
     const tabData: Record<string, IActivityDto[]> = {
         all: allList,
@@ -208,7 +214,8 @@ const ActivitiesPage: React.FC = () => {
             render: (val, record) => (
                 <Button
                     type="link"
-                    style={{ color: 'white', fontWeight: 500, padding: 0, height: 'auto' }}
+                    className={styles.primaryText}
+                    style={{ padding: 0, height: 'auto' }}
                     onClick={() => { setSelectedActivity(record); setIsViewOpen(true); }}
                 >
                     {val}
@@ -225,12 +232,12 @@ const ActivitiesPage: React.FC = () => {
             dataIndex: 'relatedToTitle',
             render: (val, record) => val
                 ? <Tag color="geekblue">{record.relatedToTypeName}: {val}</Tag>
-                : <span style={{ color: '#666' }}>—</span>,
+                : <span className={styles.mutedTextSmall}>—</span>,
         },
         {
             title: 'Assigned To',
             dataIndex: 'assignedToName',
-            render: val => <span style={{ color: '#d4d4d4' }}>{val || '—'}</span>,
+            render: val => <span className={styles.bodyText}>{val || '—'}</span>,
         },
         {
             title: 'Priority',
@@ -259,19 +266,19 @@ const ActivitiesPage: React.FC = () => {
                 <Space size="small">
                     <Button
                         size="small" type="text" icon={<EyeOutlined />}
-                        style={{ color: '#1890ff' }}
+                        className={styles.btnView}
                         onClick={() => { setSelectedActivity(record); setIsViewOpen(true); }}
                     />
                     {record.status === 1 && (
                         <>
                             <Button
                                 size="small" type="text" icon={<EditOutlined />}
-                                style={{ color: '#faad14' }}
+                                className={styles.btnWarn}
                                 onClick={() => openEdit(record)}
                             />
                             <Button
                                 size="small" type="text" icon={<CheckOutlined />}
-                                style={{ color: '#52c41a' }}
+                                className={styles.btnSuccess}
                                 onClick={() => openComplete(record)}
                             />
                             <Popconfirm
@@ -279,7 +286,7 @@ const ActivitiesPage: React.FC = () => {
                                 onConfirm={() => handleCancel(record.id)}
                                 okText="Yes" cancelText="No"
                             >
-                                <Button size="small" type="text" icon={<CloseOutlined />} style={{ color: '#faad14' }} />
+                                <Button size="small" type="text" icon={<CloseOutlined />} className={styles.btnWarn} />
                             </Popconfirm>
                         </>
                     )}
@@ -288,7 +295,7 @@ const ActivitiesPage: React.FC = () => {
                         onConfirm={() => handleDelete(record.id)}
                         okText="Yes" cancelText="No"
                     >
-                        <Button size="small" type="text" icon={<DeleteOutlined />} style={{ color: '#ff4d4f' }} />
+                        <Button size="small" type="text" icon={<DeleteOutlined />} className={styles.btnDelete} />
                     </Popconfirm>
                 </Space>
             ),
@@ -296,12 +303,12 @@ const ActivitiesPage: React.FC = () => {
     ];
 
     return (
-        <div style={pageStyle}>
+        <div className={styles.page}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div className={styles.pageHeader}>
                 <div>
-                    <Title level={2} style={{ color: 'white', margin: 0 }}>Activities</Title>
-                    <Text style={{ color: '#8c8c8c' }}>Track calls, meetings, emails and tasks</Text>
+                    <Title level={2} className={styles.pageTitle} >Activities</Title>
+                    <Text className={styles.pageSubtitle}>Track calls, meetings, emails and tasks</Text>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => setIsCreateOpen(true)}>
                     Log Activity
@@ -309,17 +316,16 @@ const ActivitiesPage: React.FC = () => {
             </div>
 
             {/* Tabs + search */}
-            <div style={{ ...cardStyle, padding: '8px 16px 0', marginBottom: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <div className={act.tabsBar}>
+                <div className={styles.toolbarRow} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
                     <Tabs
                         activeKey={activeTab}
                         onChange={handleTabChange}
-                        style={{ marginBottom: 0 }}
                         items={[
-                            { key: 'all', label: <span style={{ color: activeTab === 'all' ? '#1890ff' : '#8c8c8c' }}>All <Badge count={allList.length} showZero style={{ backgroundColor: '#1890ff' }} /></span> },
-                            { key: 'mine', label: <span style={{ color: activeTab === 'mine' ? '#1890ff' : '#8c8c8c' }}>My Activities</span> },
-                            { key: 'upcoming', label: <span style={{ color: activeTab === 'upcoming' ? '#faad14' : '#8c8c8c' }}>Upcoming <Badge count={upcomingList.length} showZero style={{ backgroundColor: '#faad14' }} /></span> },
-                            { key: 'overdue', label: <span style={{ color: activeTab === 'overdue' ? '#ff4d4f' : '#8c8c8c' }}>Overdue <Badge count={overdueList.length} showZero style={{ backgroundColor: '#ff4d4f' }} /></span> },
+                            { key: 'all', label: <span className={cx(act.tabLabel, activeTab === 'all' && act.tabLabelActive)}>All <Badge count={allList.length} showZero style={{ backgroundColor: '#1890ff' }} /></span> },
+                            { key: 'mine', label: <span className={cx(act.tabLabel, activeTab === 'mine' && act.tabLabelActive)}>My Activities</span> },
+                            { key: 'upcoming', label: <span className={cx(act.tabLabel, activeTab === 'upcoming' && act.tabLabelWarning)}>Upcoming <Badge count={upcomingList.length} showZero style={{ backgroundColor: '#faad14' }} /></span> },
+                            { key: 'overdue', label: <span className={cx(act.tabLabel, activeTab === 'overdue' && act.tabLabelDanger)}>Overdue <Badge count={overdueList.length} showZero style={{ backgroundColor: '#ff4d4f' }} /></span> },
                         ]}
                     />
                     <Input
@@ -327,14 +333,15 @@ const ActivitiesPage: React.FC = () => {
                         placeholder="Search by subject or assignee…"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        style={{ width: 280, background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'white' }}
+                        className={styles.searchInput}
+                        style={{ width: 280 }}
                         allowClear
                     />
                 </div>
             </div>
 
             {/* Table */}
-            <div style={cardStyle}>
+            <div className={styles.tableCard}>
                 <Table
                     columns={columns}
                     dataSource={displayData}
@@ -349,7 +356,7 @@ const ActivitiesPage: React.FC = () => {
 
             {/* ── Create Modal ── */}
             <Modal
-                title={<span style={{ color: 'white' }}>Log New Activity</span>}
+                title={<span className={styles.pageTitle}>Log New Activity</span>}
                 open={isCreateOpen}
                 onCancel={() => { setIsCreateOpen(false); createForm.resetFields(); setRelatedType(undefined); }}
                 onOk={() => createForm.submit()}
@@ -358,20 +365,20 @@ const ActivitiesPage: React.FC = () => {
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={createForm} layout="vertical" onFinish={handleCreate}>
-                    <Form.Item name="type" label={<span style={{ color: '#d4d4d4' }}>Activity Type</span>}
+                    <Form.Item name="type" label={<FormLabel text="Activity Type" />}
                         rules={[{ required: true, message: 'Select a type' }]}>
                         <Select options={ACTIVITY_TYPES.map(t => ({ value: t.value, label: t.label }))}
                             placeholder="Select type" />
                     </Form.Item>
-                    <Form.Item name="subject" label={<span style={{ color: '#d4d4d4' }}>Subject</span>}
+                    <Form.Item name="subject" label={<FormLabel text="Subject" />}
                         rules={[{ required: true, message: 'Enter a subject' }]}>
                         <Input placeholder="e.g. Discovery call with Acme" />
                     </Form.Item>
-                    <Form.Item name="description" label={<span style={{ color: '#d4d4d4' }}>Description</span>}>
+                    <Form.Item name="description" label={<FormLabel text="Description" />}>
                         <TextArea rows={3} placeholder="Optional details…" />
                     </Form.Item>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <Form.Item name="relatedToType" label={<span style={{ color: '#d4d4d4' }}>Related Entity Type</span>}>
+                    <div className={styles.formGrid}>
+                        <Form.Item name="relatedToType" label={<FormLabel text="Related Entity Type" />}>
                             <Select
                                 options={RELATED_TYPES}
                                 placeholder="None"
@@ -379,7 +386,7 @@ const ActivitiesPage: React.FC = () => {
                                 onChange={v => { setRelatedType(v); createForm.setFieldValue('relatedToId', undefined); }}
                             />
                         </Form.Item>
-                        <Form.Item name="relatedToId" label={<span style={{ color: '#d4d4d4' }}>Related To</span>}>
+                        <Form.Item name="relatedToId" label={<FormLabel text="Related To" />}>
                             <Select
                                 options={relatedOptions}
                                 placeholder="Select record"
@@ -388,17 +395,17 @@ const ActivitiesPage: React.FC = () => {
                                 showSearch
                             />
                         </Form.Item>
-                        <Form.Item name="priority" label={<span style={{ color: '#d4d4d4' }}>Priority</span>}>
+                        <Form.Item name="priority" label={<FormLabel text="Priority" />}>
                             <Select options={PRIORITIES.map(p => ({ value: p.value, label: p.label }))} placeholder="Medium" />
                         </Form.Item>
-                        <Form.Item name="dueDate" label={<span style={{ color: '#d4d4d4' }}>Due Date</span>}
+                        <Form.Item name="dueDate" label={<FormLabel text="Due Date" />}
                             rules={[{ required: true, message: 'Pick a due date' }]}>
                             <DatePicker style={{ width: '100%' }} showTime format="YYYY-MM-DD HH:mm" />
                         </Form.Item>
-                        <Form.Item name="duration" label={<span style={{ color: '#d4d4d4' }}>Duration (min)</span>}>
+                        <Form.Item name="duration" label={<FormLabel text="Duration (min)" />}>
                             <InputNumber min={1} placeholder="60" style={{ width: '100%' }} />
                         </Form.Item>
-                        <Form.Item name="location" label={<span style={{ color: '#d4d4d4' }}>Location</span>}>
+                        <Form.Item name="location" label={<FormLabel text="Location" />}>
                             <Input placeholder="e.g. Google Meet" />
                         </Form.Item>
                     </div>
@@ -407,7 +414,7 @@ const ActivitiesPage: React.FC = () => {
 
             {/* ── Edit Modal ── */}
             <Modal
-                title={<span style={{ color: 'white' }}>Edit Activity</span>}
+                title={<span className={styles.pageTitle}>Edit Activity</span>}
                 open={isEditOpen}
                 onCancel={() => setIsEditOpen(false)}
                 onOk={() => editForm.submit()}
@@ -416,28 +423,28 @@ const ActivitiesPage: React.FC = () => {
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={editForm} layout="vertical" onFinish={handleUpdate}>
-                    <Form.Item name="subject" label={<span style={{ color: '#d4d4d4' }}>Subject</span>}
+                    <Form.Item name="subject" label={<FormLabel text="Subject" />}
                         rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="description" label={<span style={{ color: '#d4d4d4' }}>Description</span>}>
+                    <Form.Item name="description" label={<FormLabel text="Description" />}>
                         <TextArea rows={3} />
                     </Form.Item>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <Form.Item name="priority" label={<span style={{ color: '#d4d4d4' }}>Priority</span>}>
+                    <div className={styles.formGrid}>
+                        <Form.Item name="priority" label={<FormLabel text="Priority" />}>
                             <Select options={PRIORITIES.map(p => ({ value: p.value, label: p.label }))} />
                         </Form.Item>
-                        <Form.Item name="dueDate" label={<span style={{ color: '#d4d4d4' }}>Due Date</span>}>
+                        <Form.Item name="dueDate" label={<FormLabel text="Due Date" />}>
                             <DatePicker style={{ width: '100%' }} showTime format="YYYY-MM-DD HH:mm" />
                         </Form.Item>
-                        <Form.Item name="duration" label={<span style={{ color: '#d4d4d4' }}>Duration (min)</span>}>
+                        <Form.Item name="duration" label={<FormLabel text="Duration (min)" />}>
                             <InputNumber min={1} style={{ width: '100%' }} />
                         </Form.Item>
-                        <Form.Item name="location" label={<span style={{ color: '#d4d4d4' }}>Location</span>}>
+                        <Form.Item name="location" label={<FormLabel text="Location" />}>
                             <Input />
                         </Form.Item>
                     </div>
-                    <Form.Item name="outcome" label={<span style={{ color: '#d4d4d4' }}>Outcome</span>}>
+                    <Form.Item name="outcome" label={<FormLabel text="Outcome" />}>
                         <TextArea rows={2} placeholder="What was the outcome?" />
                     </Form.Item>
                 </Form>
@@ -445,7 +452,7 @@ const ActivitiesPage: React.FC = () => {
 
             {/* ── Complete Modal ── */}
             <Modal
-                title={<span style={{ color: 'white' }}>Complete Activity</span>}
+                title={<span className={styles.pageTitle}>Complete Activity</span>}
                 open={isCompleteOpen}
                 onCancel={() => setIsCompleteOpen(false)}
                 onOk={() => completeForm.submit()}
@@ -453,11 +460,11 @@ const ActivitiesPage: React.FC = () => {
                 okButtonProps={{ style: { background: '#52c41a', borderColor: '#52c41a' } }}
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
-                <p style={{ color: '#8c8c8c', marginBottom: 16 }}>
+                <p className={act.completeNote}>
                     Completing: <strong style={{ color: 'white' }}>{selectedActivity?.subject}</strong>
                 </p>
                 <Form form={completeForm} layout="vertical" onFinish={handleComplete}>
-                    <Form.Item name="outcome" label={<span style={{ color: '#d4d4d4' }}>Outcome / Notes</span>}>
+                    <Form.Item name="outcome" label={<FormLabel text="Outcome / Notes" />}>
                         <TextArea rows={4} placeholder="What happened? What was agreed?" />
                     </Form.Item>
                 </Form>
@@ -465,7 +472,7 @@ const ActivitiesPage: React.FC = () => {
 
             {/* ── View Drawer ── */}
             <Modal
-                title={<span style={{ color: 'white' }}>{selectedActivity?.subject}</span>}
+                title={<span className={styles.pageTitle}>{selectedActivity?.subject}</span>}
                 open={isViewOpen}
                 onCancel={() => setIsViewOpen(false)}
                 footer={null}
@@ -473,7 +480,7 @@ const ActivitiesPage: React.FC = () => {
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 {selectedActivity && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div className={styles.detailContainer}>
                         {[
                             ['Type', typeTag(selectedActivity.type, selectedActivity.typeName)],
                             ['Status', statusTag(selectedActivity.status, selectedActivity.statusName)],
@@ -488,9 +495,9 @@ const ActivitiesPage: React.FC = () => {
                             ['Description', selectedActivity.description || '—'],
                             ['Outcome', selectedActivity.outcome || '—'],
                         ].map(([label, value]) => (
-                            <div key={label as string} style={{ display: 'flex', gap: 12 }}>
-                                <span style={{ color: '#8c8c8c', minWidth: 100 }}>{label}</span>
-                                <span style={{ color: 'white' }}>{value}</span>
+                            <div key={label as string} className={styles.detailRow}>
+                                <span className={styles.detailLabelNarrow}>{label}</span>
+                                <span className={styles.detailValue}>{value}</span>
                             </div>
                         ))}
                     </div>

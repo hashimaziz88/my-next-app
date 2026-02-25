@@ -15,6 +15,8 @@ import { useOpportunityActions, useOpportunityState } from '@/providers/opportun
 import { useClientActions, useClientState } from '@/providers/clientProvider';
 import type { TableProps } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
+import { useStyles } from '@/app/dashboard/(routes)/_styles/style';
+import FormLabel from '@/app/dashboard/(routes)/_components/FormLabel';
 
 const { Title, Text } = Typography;
 
@@ -54,11 +56,6 @@ const fileIcon = (contentType: string | undefined | null, fileName: string) => {
     return <FileOutlined style={{ color: '#8c8c8c', fontSize: 18 }} />;
 };
 
-const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
-const cardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12,
-};
-
 /* ─── component ───────────────────────────────────────────────────────── */
 const DocumentsPage: React.FC = () => {
     const { getDocuments, uploadDocument, downloadDocument, deleteDocument } = useDocumentActions();
@@ -79,6 +76,7 @@ const DocumentsPage: React.FC = () => {
     const [relatedType, setRelatedType] = useState<number | undefined>(undefined);
     const [uploading, setUploading] = useState(false);
     const [uploadForm] = Form.useForm();
+    const { styles } = useStyles();
 
     useEffect(() => {
         getDocuments({ pageSize: 100 });
@@ -160,7 +158,7 @@ const DocumentsPage: React.FC = () => {
             render: (val, record) => (
                 <Space>
                     {fileIcon(record.contentType, val)}
-                    <span style={{ color: 'white', fontWeight: 500 }}>{val}</span>
+                    <span className={styles.primaryText}>{val}</span>
                 </Space>
             ),
         },
@@ -177,22 +175,22 @@ const DocumentsPage: React.FC = () => {
             dataIndex: 'relatedToTitle',
             render: (val, record) => val
                 ? <Tag color="geekblue">{record.relatedToTypeName}: {val}</Tag>
-                : <span style={{ color: '#666' }}>—</span>,
+                : <span className={styles.mutedTextSmall}>—</span>,
         },
         {
             title: 'Size',
             dataIndex: 'fileSize',
-            render: val => <span style={{ color: '#8c8c8c', fontFamily: 'monospace' }}>{formatBytes(val)}</span>,
+            render: val => <span className={styles.monospaceText}>{formatBytes(val)}</span>,
         },
         {
             title: 'Uploaded By',
             dataIndex: 'uploadedByName',
-            render: val => <span style={{ color: '#d4d4d4' }}>{val}</span>,
+            render: val => <span className={styles.bodyText}>{val}</span>,
         },
         {
             title: 'Date',
             dataIndex: 'createdAt',
-            render: val => <span style={{ color: '#8c8c8c' }}>{val ? new Date(val).toLocaleDateString() : '—'}</span>,
+            render: val => <span className={styles.mutedText}>{val ? new Date(val).toLocaleDateString() : '—'}</span>,
         },
         {
             title: 'Actions',
@@ -201,12 +199,12 @@ const DocumentsPage: React.FC = () => {
                 <Space size="small">
                     <Button
                         size="small" type="text" icon={<EyeOutlined />}
-                        style={{ color: '#1890ff' }}
+                        className={styles.btnView}
                         onClick={() => { setSelectedDoc(record); setIsViewOpen(true); }}
                     />
                     <Button
                         size="small" type="text" icon={<DownloadOutlined />}
-                        style={{ color: '#52c41a' }}
+                        className={styles.btnEdit}
                         loading={isPending && selectedDoc?.id === record.id}
                         onClick={() => handleDownload(record)}
                     />
@@ -215,7 +213,7 @@ const DocumentsPage: React.FC = () => {
                         onConfirm={() => handleDelete(record.id)}
                         okText="Yes" cancelText="No"
                     >
-                        <Button size="small" type="text" icon={<DeleteOutlined />} style={{ color: '#ff4d4f' }} />
+                        <Button size="small" type="text" icon={<DeleteOutlined />} className={styles.btnDelete} />
                     </Popconfirm>
                 </Space>
             ),
@@ -223,12 +221,12 @@ const DocumentsPage: React.FC = () => {
     ];
 
     return (
-        <div style={pageStyle}>
+        <div className={styles.page}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div className={styles.pageHeader}>
                 <div>
-                    <Title level={2} style={{ color: 'white', margin: 0 }}>Documents</Title>
-                    <Text style={{ color: '#8c8c8c' }}>File attachments for clients, opportunities, proposals and contracts</Text>
+                    <Title level={2} className={styles.pageTitle}>Documents</Title>
+                    <Text className={styles.pageSubtitle}>File attachments for clients, opportunities, proposals and contracts</Text>
                 </div>
                 <Button type="primary" icon={<UploadOutlined />} size="large" onClick={() => setIsUploadOpen(true)}>
                     Upload File
@@ -236,14 +234,15 @@ const DocumentsPage: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div style={{ ...cardStyle, padding: '12px 16px', marginBottom: 16 }}>
-                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div className={styles.toolbar}>
+                <div className={styles.toolbarRow}>
                     <Input
                         prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
                         placeholder="Search by filename or description…"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        style={{ width: 300, background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'white' }}
+                        className={styles.searchInput}
+                        style={{ width: 300 }}
                         allowClear
                     />
                     <Select
@@ -260,14 +259,14 @@ const DocumentsPage: React.FC = () => {
                         style={{ width: 200 }}
                         placeholder="Entity Type"
                     />
-                    <Text style={{ color: '#8c8c8c', marginLeft: 'auto' }}>
+                    <Text className={styles.mutedText} style={{ marginLeft: 'auto' }}>
                         {docs.length} {docs.length === 1 ? 'file' : 'files'}
                     </Text>
                 </div>
             </div>
 
             {/* Table */}
-            <div style={cardStyle}>
+            <div className={styles.tableCard}>
                 <Table
                     columns={columns}
                     dataSource={docs}
@@ -282,7 +281,7 @@ const DocumentsPage: React.FC = () => {
 
             {/* ── Upload Modal ── */}
             <Modal
-                title={<span style={{ color: 'white' }}>Upload Document</span>}
+                title={<span className={styles.pageTitle}>Upload Document</span>}
                 open={isUploadOpen}
                 onCancel={() => { setIsUploadOpen(false); uploadForm.resetFields(); setFileList([]); setRelatedType(undefined); }}
                 onOk={() => uploadForm.submit()}
@@ -294,7 +293,7 @@ const DocumentsPage: React.FC = () => {
                 <Form form={uploadForm} layout="vertical" onFinish={handleUpload}>
                     {/* File picker — not managed by Form, just a regular Upload */}
                     <div style={{ marginBottom: 16 }}>
-                        <div style={{ color: '#d4d4d4', marginBottom: 6 }}>File <span style={{ color: '#ff4d4f' }}>*</span></div>
+                        <div className={styles.fileLabel}>File <span className={styles.requiredStar}>*</span></div>
                         <Upload
                             fileList={fileList}
                             beforeUpload={file => { setFileList([file as unknown as UploadFile]); return false; }}
@@ -306,13 +305,13 @@ const DocumentsPage: React.FC = () => {
                         {uploading && <Progress percent={99} status="active" style={{ marginTop: 8 }} />}
                     </div>
 
-                    <Form.Item name="category" label={<span style={{ color: '#d4d4d4' }}>Category</span>}
+                    <Form.Item name="category" label={<FormLabel text="Category" />}
                         rules={[{ required: true, message: 'Select a category' }]}>
                         <Select options={DOC_CATEGORIES.map(c => ({ value: c.value, label: c.label }))} placeholder="Select category" />
                     </Form.Item>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <Form.Item name="relatedToType" label={<span style={{ color: '#d4d4d4' }}>Entity Type</span>}
+                    <div className={styles.formGrid}>
+                        <Form.Item name="relatedToType" label={<FormLabel text="Entity Type" />}
                             rules={[{ required: true, message: 'Select entity type' }]}>
                             <Select
                                 options={RELATED_TYPES}
@@ -320,7 +319,7 @@ const DocumentsPage: React.FC = () => {
                                 onChange={v => { setRelatedType(v); uploadForm.setFieldValue('relatedToId', undefined); }}
                             />
                         </Form.Item>
-                        <Form.Item name="relatedToId" label={<span style={{ color: '#d4d4d4' }}>Linked Record</span>}
+                        <Form.Item name="relatedToId" label={<FormLabel text="Linked Record" />}
                             rules={[{ required: true, message: 'Select a record' }]}>
                             <Select
                                 options={relatedOptions}
@@ -331,7 +330,7 @@ const DocumentsPage: React.FC = () => {
                         </Form.Item>
                     </div>
 
-                    <Form.Item name="description" label={<span style={{ color: '#d4d4d4' }}>Description</span>}>
+                    <Form.Item name="description" label={<FormLabel text="Description" />}>
                         <Input placeholder="Optional description" />
                     </Form.Item>
                 </Form>
@@ -339,7 +338,7 @@ const DocumentsPage: React.FC = () => {
 
             {/* ── View Modal ── */}
             <Modal
-                title={<span style={{ color: 'white' }}>{selectedDoc?.fileName}</span>}
+                title={<span className={styles.pageTitle}>{selectedDoc?.fileName}</span>}
                 open={isViewOpen}
                 onCancel={() => setIsViewOpen(false)}
                 footer={
@@ -356,7 +355,7 @@ const DocumentsPage: React.FC = () => {
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 {selectedDoc && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div className={styles.detailContainer}>
                         {[
                             ['File Name', <Space key="fn">{fileIcon(selectedDoc.contentType, selectedDoc.fileName)}<span>{selectedDoc.fileName}</span></Space>],
                             ['Category', (() => { const cat = DOC_CATEGORIES.find(c => c.value === selectedDoc.category); return <Tag color={cat?.color ?? 'default'}>{selectedDoc.categoryName || cat?.label}</Tag>; })()],
@@ -369,9 +368,9 @@ const DocumentsPage: React.FC = () => {
                             ['Uploaded At', selectedDoc.createdAt ? new Date(selectedDoc.createdAt).toLocaleString() : '—'],
                             ['Description', selectedDoc.description || '—'],
                         ].map(([label, value]) => (
-                            <div key={label as string} style={{ display: 'flex', gap: 12 }}>
-                                <span style={{ color: '#8c8c8c', minWidth: 110 }}>{label}</span>
-                                <span style={{ color: 'white' }}>{value}</span>
+                            <div key={label as string} className={styles.detailRow}>
+                                <span className={styles.detailLabel}>{label}</span>
+                                <span className={styles.detailValue}>{value}</span>
                             </div>
                         ))}
                     </div>

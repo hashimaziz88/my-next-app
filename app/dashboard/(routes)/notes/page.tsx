@@ -12,6 +12,8 @@ import { useNoteActions, useNoteState } from '@/providers/noteProvider';
 import { INoteDto, ICreateNoteDto, IUpdateNoteDto } from '@/providers/noteProvider/context';
 import { useOpportunityActions, useOpportunityState } from '@/providers/opportunityProvider';
 import { useClientActions, useClientState } from '@/providers/clientProvider';
+import { useStyles } from '@/app/dashboard/(routes)/_styles/style';
+import FormLabel from '@/app/dashboard/(routes)/_components/FormLabel';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -24,21 +26,6 @@ const RELATED_TYPES = [
     { value: 4, label: 'Contract' },
 ];
 
-/* ─── styles ──────────────────────────────────────────────────────────── */
-const pageStyle: React.CSSProperties = { padding: 24, minHeight: '100vh', background: 'transparent' };
-const noteCardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 12,
-    marginBottom: 12,
-};
-const headerCardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 12,
-    marginBottom: 16,
-    padding: '12px 16px',
-};
 
 /* ─── component ───────────────────────────────────────────────────────── */
 const NotesPage: React.FC = () => {
@@ -58,6 +45,7 @@ const NotesPage: React.FC = () => {
     const [relatedType, setRelatedType] = useState<number | undefined>(undefined);
     const [createForm] = Form.useForm();
     const [editForm] = Form.useForm();
+    const { styles } = useStyles();
 
     useEffect(() => {
         getNotes({ pageSize: 100 });
@@ -123,12 +111,12 @@ const NotesPage: React.FC = () => {
     };
 
     return (
-        <div style={pageStyle}>
+        <div className={styles.page}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div className={styles.pageHeader}>
                 <div>
-                    <Title level={2} style={{ color: 'white', margin: 0 }}>Notes</Title>
-                    <Text style={{ color: '#8c8c8c' }}>Freeform notes attached to any entity</Text>
+                    <Title level={2} className={styles.pageTitle}>Notes</Title>
+                    <Text className={styles.pageSubtitle}>Freeform notes attached to any entity</Text>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => setIsCreateOpen(true)}>
                     Add Note
@@ -136,17 +124,15 @@ const NotesPage: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div style={headerCardStyle}>
-                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div className={styles.toolbar}>
+                <div className={styles.toolbarRow}>
                     <Input
                         prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
                         placeholder="Search notes…"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        style={{
-                            width: 280, background: 'rgba(255,255,255,0.06)',
-                            borderColor: 'rgba(255,255,255,0.12)', color: 'white',
-                        }}
+                        className={styles.searchInput}
+                        style={{ width: 280 }}
                         allowClear
                     />
                     <Select
@@ -156,7 +142,7 @@ const NotesPage: React.FC = () => {
                         style={{ width: 200 }}
                         placeholder="Filter by entity type"
                     />
-                    <Text style={{ color: '#8c8c8c', marginLeft: 'auto' }}>
+                    <Text className={styles.mutedText} style={{ marginLeft: 'auto' }}>
                         {notes.length} {notes.length === 1 ? 'note' : 'notes'}
                     </Text>
                 </div>
@@ -164,24 +150,24 @@ const NotesPage: React.FC = () => {
 
             {/* Notes list */}
             {isPending && (
-                <div style={{ textAlign: 'center', padding: 80 }}>
+                <div className={styles.spinCenter}>
                     <Spin size="large" />
                 </div>
             )}
             {!isPending && notes.length === 0 && (
                 <Empty
-                    description={<span style={{ color: '#8c8c8c' }}>No notes yet. Add the first one.</span>}
+                    description={<span className={styles.mutedText}>No notes yet. Add the first one.</span>}
                     style={{ padding: 60 }}
                 />
             )}
             {!isPending && notes.length > 0 && (
                 <>
                     {notes.map(note => (
-                        <Card key={note.id} style={noteCardStyle} styles={{ body: { padding: '16px 20px' } }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                                <div style={{ flex: 1 }}>
+                        <Card key={note.id} className={styles.noteCard} styles={{ body: { padding: '16px 20px' } }}>
+                            <div className={styles.noteActions}>
+                                <div className={styles.noteBody}>
                                     {/* metadata row */}
-                                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
+                                    <div className={styles.noteMetaRow}>
                                         {!!note.relatedToType && (
                                             <Tag color="geekblue">
                                                 {note.relatedToTypeName}
@@ -191,13 +177,14 @@ const NotesPage: React.FC = () => {
                                             ? <Tag icon={<LockOutlined />} color="orange">Private</Tag>
                                             : <Tag icon={<GlobalOutlined />} color="default">Shared</Tag>
                                         }
-                                        <span style={{ color: '#666', fontSize: 12 }}>
+                                        <span className={styles.mutedTextSmall}>
                                             by {note.createdByName} · {formatDate(note.createdAt)}
                                         </span>
                                     </div>
                                     {/* content */}
                                     <Paragraph
-                                        style={{ color: '#d4d4d4', marginBottom: 0, whiteSpace: 'pre-wrap' }}
+                                        className={styles.bodyText}
+                                        style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}
                                         ellipsis={{ rows: 4, expandable: true, symbol: 'read more' }}
                                     >
                                         {note.content}
@@ -206,7 +193,7 @@ const NotesPage: React.FC = () => {
                                 <Space>
                                     <Button
                                         size="small" type="text" icon={<EditOutlined />}
-                                        style={{ color: '#faad14' }}
+                                        className={styles.btnWarn}
                                         onClick={() => openEdit(note)}
                                     />
                                     <Popconfirm
@@ -214,7 +201,7 @@ const NotesPage: React.FC = () => {
                                         onConfirm={() => handleDelete(note.id)}
                                         okText="Yes" cancelText="No"
                                     >
-                                        <Button size="small" type="text" icon={<DeleteOutlined />} style={{ color: '#ff4d4f' }} />
+                                        <Button size="small" type="text" icon={<DeleteOutlined />} className={styles.btnDelete} />
                                     </Popconfirm>
                                 </Space>
                             </div>
@@ -225,7 +212,7 @@ const NotesPage: React.FC = () => {
 
             {/* ── Create Modal ── */}
             <Modal
-                title={<span style={{ color: 'white' }}>Add Note</span>}
+                title={<span className={styles.pageTitle}>Add Note</span>}
                 open={isCreateOpen}
                 onCancel={() => { setIsCreateOpen(false); createForm.resetFields(); setRelatedType(undefined); }}
                 onOk={() => createForm.submit()}
@@ -234,12 +221,12 @@ const NotesPage: React.FC = () => {
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={createForm} layout="vertical" onFinish={handleCreate}>
-                    <Form.Item name="content" label={<span style={{ color: '#d4d4d4' }}>Note Content</span>}
+                    <Form.Item name="content" label={<FormLabel text="Note Content" />}
                         rules={[{ required: true, message: 'Write something' }]}>
                         <TextArea rows={5} placeholder="Write your note here…" />
                     </Form.Item>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <Form.Item name="relatedToType" label={<span style={{ color: '#d4d4d4' }}>Entity Type</span>}
+                    <div className={styles.formGrid}>
+                        <Form.Item name="relatedToType" label={<FormLabel text="Entity Type" />}
                             rules={[{ required: true, message: 'Select entity type' }]}>
                             <Select
                                 options={RELATED_TYPES}
@@ -247,7 +234,7 @@ const NotesPage: React.FC = () => {
                                 onChange={v => { setRelatedType(v); createForm.setFieldValue('relatedToId', undefined); }}
                             />
                         </Form.Item>
-                        <Form.Item name="relatedToId" label={<span style={{ color: '#d4d4d4' }}>Linked Record</span>}
+                        <Form.Item name="relatedToId" label={<FormLabel text="Linked Record" />}
                             rules={[{ required: true, message: 'Select a record' }]}>
                             <Select
                                 options={relatedOptions}
@@ -257,7 +244,7 @@ const NotesPage: React.FC = () => {
                             />
                         </Form.Item>
                     </div>
-                    <Form.Item name="isPrivate" label={<span style={{ color: '#d4d4d4' }}>Private</span>} valuePropName="checked">
+                    <Form.Item name="isPrivate" label={<FormLabel text="Private" />} valuePropName="checked">
                         <Switch checkedChildren={<LockOutlined />} unCheckedChildren={<GlobalOutlined />} />
                     </Form.Item>
                 </Form>
@@ -265,7 +252,7 @@ const NotesPage: React.FC = () => {
 
             {/* ── Edit Modal ── */}
             <Modal
-                title={<span style={{ color: 'white' }}>Edit Note</span>}
+                title={<span className={styles.pageTitle}>Edit Note</span>}
                 open={isEditOpen}
                 onCancel={() => setIsEditOpen(false)}
                 onOk={() => editForm.submit()}
@@ -274,11 +261,11 @@ const NotesPage: React.FC = () => {
                 styles={{ body: { background: 'transparent' }, header: { background: 'transparent' } }}
             >
                 <Form form={editForm} layout="vertical" onFinish={handleUpdate}>
-                    <Form.Item name="content" label={<span style={{ color: '#d4d4d4' }}>Content</span>}
+                    <Form.Item name="content" label={<FormLabel text="Content" />}
                         rules={[{ required: true }]}>
                         <TextArea rows={5} />
                     </Form.Item>
-                    <Form.Item name="isPrivate" label={<span style={{ color: '#d4d4d4' }}>Private</span>} valuePropName="checked">
+                    <Form.Item name="isPrivate" label={<FormLabel text="Private" />} valuePropName="checked">
                         <Switch checkedChildren={<LockOutlined />} unCheckedChildren={<GlobalOutlined />} />
                     </Form.Item>
                 </Form>
